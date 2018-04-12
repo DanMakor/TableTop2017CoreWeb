@@ -1,0 +1,58 @@
+﻿@model TableTop2017CoreWeb.Models.RoundMatchups
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>RoundMatchups</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <dt>
+            @Html.DisplayNameFor(model => model.player.firstName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.player.firstName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.player.lastName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.player.lastName)
+        </dd>
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="id" />
+            <div class="form-group">
+                <label asp-for="roundNo" class="control-label"></label>
+                <input asp-for="roundNo" class="form-control" />
+                <span asp-validation-for="roundNo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="battleScore" class="control-label"></label>
+                <input asp-for="battleScore" class="form-control" />
+                <span asp-validation-for="battleScore" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="sportsmanshipPoints" class="control-label"></label>
+                <input asp-for="sportsmanshipPoints" class="form-control" />
+                <span asp-validation-for="sportsmanshipPoints" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="table" class="control-label"></label>
+                <input asp-for="table" class="form-control" />
+                <span asp-validation-for="table" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

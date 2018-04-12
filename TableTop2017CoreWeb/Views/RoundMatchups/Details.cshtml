@@ -1,0 +1,48 @@
+﻿@model TableTop2017CoreWeb.Models.RoundMatchups
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>RoundMatchups</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.roundNo)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.roundNo)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.player.firstName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.player.firstName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.battleScore)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.battleScore)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.sportsmanshipPoints)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.sportsmanshipPoints)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.table)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.table)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

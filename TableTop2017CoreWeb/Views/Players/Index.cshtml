@@ -1,0 +1,90 @@
+﻿@model IEnumerable<TableTop2017CoreWeb.Models.Player>
+
+
+@{
+    ViewData["Title"] = "TableTop Tournament Bracket";
+}
+
+<div class="jumbotron mt-sm">
+    <h1 class>TableTop</h1>
+    <p class="lead">Tournament bracket generation software for tabletop war gaming</p>
+</div>
+
+<div class="row mt-sm">
+    <div class="col-md-3">
+        <label class="col-form-label" for="noOfTables"><h4 class="text-primary">Number of Tables</h4></label>
+        <input type="number" min="1" max="100" value="1" class="form-control" id="noOfTables"></input>
+    </div>
+
+    <div class="col-md-3">
+         <h4 class="text-primary">Click to Add new Players</h4>
+         @Html.ActionLink("Add Player", "Create", "Players", null,new { @class = "btn btn-primary" })
+    </div>
+
+</div>
+
+<div class="col-md-12 mt-sm">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.firstName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.lastName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.totalBattleScore)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.emailAddress)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.notes)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.hasPaid)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.firstName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.lastName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.totalBattleScore)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.emailAddress)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.notes)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.hasPaid)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="col-md-3 mt-sm">
+    @Html.ActionLink("Generate Round", "GenerateRoundMatchups", "RoundMatchups", null, new { @class = "btn btn-primary" })
+</div>
+
+@section scripts{
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+}

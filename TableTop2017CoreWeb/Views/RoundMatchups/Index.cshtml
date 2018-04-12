@@ -1,0 +1,81 @@
+﻿@model IEnumerable<TableTop2017CoreWeb.Models.RoundMatchups>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+<table>
+
+
+
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.roundNo)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.player)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.opponent)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.player.totalBattleScore)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.battleScore)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.sportsmanshipPoints)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.table)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.roundNo)
+                </td>
+                <th>
+                    @Html.DisplayFor(modelItem => item.player.firstName)
+                </th>
+                <th>
+                    @Html.DisplayFor(modelItem => item.opponent.firstName)
+                </th>
+                <th>
+                    @Html.DisplayFor(modelItem => item.player.totalBattleScore)
+                </th>
+                <td>
+                    @Html.DisplayFor(modelItem => item.battleScore)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.sportsmanshipPoints)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.table)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.id">Delete</a>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="col-md-3 mt-sm">
+        @Html.ActionLink("Delete Database", "Database", "RoundMatchups", null, new { @class = "btn btn-primary" })
+        @Html.ActionLink("Generate Next Round", "UpdateBattleScores", "Players", null, new { @class = "btn btn-primary" })
+    </div>
+
