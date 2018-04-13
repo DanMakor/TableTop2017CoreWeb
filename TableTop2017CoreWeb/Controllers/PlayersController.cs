@@ -22,18 +22,21 @@ namespace TableTop2017CoreWeb.Controllers
         // GET: Players
         public async Task<IActionResult> Index()
         {
-            List<Player> players = await _context.Players.OrderByDescending(p => p.totalBattleScore).ToListAsync();
+            List<Player> players = await _context.Players.OrderByDescending(p => p.BattleScore).ToListAsync();
             return View(players);
         }
 
         public async Task<IActionResult> UpdateBattleScores()
         {
-            List<RoundMatchups> roundMatchups = await _context.RoundMatchups.Include(r => r.player).ToListAsync();
+            List<RoundMatchups> roundMatchups = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).ToListAsync();
             foreach (RoundMatchups roundmatchup in roundMatchups)
             {
-                Player player = roundmatchup.player;
-                player.totalBattleScore += roundmatchup.battleScore;
-                _context.Update(player);
+                Player playerOne = roundmatchup.PlayerOne;
+                playerOne.BattleScore += roundmatchup.PlayerOneBattleScore;
+                Player playerTwo = roundmatchup.PlayerTwo;
+                playerTwo.BattleScore += roundmatchup.PlayerTwoBattleScore;
+                _context.Update(playerOne);
+                _context.Update(playerTwo);
             }
             if (ModelState.IsValid)
             {
@@ -52,7 +55,7 @@ namespace TableTop2017CoreWeb.Controllers
             }
 
             var player = await _context.Players
-                .SingleOrDefaultAsync(m => m.id == id);
+                .SingleOrDefaultAsync(m => m.Id == id);
             if (player == null)
             {
                 return NotFound();
@@ -72,7 +75,7 @@ namespace TableTop2017CoreWeb.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("id,firstName,lastName,emailAddress,notes,hasPaid")] Player player)
+        public async Task<IActionResult> Create([Bind("Id,Name,BattleScore,SportsmanshipScore,Army,Active,EmailAddress,Notes,Paid")] Player player)
         {
             if (ModelState.IsValid)
             {
@@ -91,7 +94,7 @@ namespace TableTop2017CoreWeb.Controllers
                 return NotFound();
             }
 
-            var player = await _context.Players.SingleOrDefaultAsync(m => m.id == id);
+            var player = await _context.Players.SingleOrDefaultAsync(m => m.Id == id);
             if (player == null)
             {
                 return NotFound();
@@ -104,9 +107,9 @@ namespace TableTop2017CoreWeb.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("id,firstName,lastName,emailAddress,notes,hasPaid")] Player player)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,BattleScore,SportsmanshipScore,Army,Active,EmailAddress,Notes,Paid")] Player player)
         {
-            if (id != player.id)
+            if (id != player.Id)
             {
                 return NotFound();
             }
@@ -120,7 +123,7 @@ namespace TableTop2017CoreWeb.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PlayerExists(player.id))
+                    if (!PlayerExists(player.Id))
                     {
                         return NotFound();
                     }
@@ -143,7 +146,7 @@ namespace TableTop2017CoreWeb.Controllers
             }
 
             var player = await _context.Players
-                .SingleOrDefaultAsync(m => m.id == id);
+                .SingleOrDefaultAsync(m => m.Id == id);
             if (player == null)
             {
                 return NotFound();
@@ -157,7 +160,7 @@ namespace TableTop2017CoreWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var player = await _context.Players.SingleOrDefaultAsync(m => m.id == id);
+            var player = await _context.Players.SingleOrDefaultAsync(m => m.Id == id);
             _context.Players.Remove(player);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -165,7 +168,7 @@ namespace TableTop2017CoreWeb.Controllers
 
         private bool PlayerExists(int id)
         {
-            return _context.Players.Any(e => e.id == id);
+            return _context.Players.Any(e => e.Id == id);
         }
  
     }

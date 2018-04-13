@@ -11,9 +11,10 @@ using TableTop2017CoreWeb.Data;
 namespace TableTop2017CoreWeb.Migrations
 {
     [DbContext(typeof(TournamentDbContext))]
-    partial class TournamentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180413042545_Players RoundMatchups Restructure")]
+    partial class PlayersRoundMatchupsRestructure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

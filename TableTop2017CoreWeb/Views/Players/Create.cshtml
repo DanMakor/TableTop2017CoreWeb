@@ -13,29 +13,46 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="firstName" class="control-label"></label>
-                <input asp-for="firstName" class="form-control" />
-                <span asp-validation-for="firstName" class="text-danger"></span>
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="lastName" class="control-label"></label>
-                <input asp-for="lastName" class="form-control" />
-                <span asp-validation-for="lastName" class="text-danger"></span>
+                <label asp-for="BattleScore" class="control-label"></label>
+                <input asp-for="BattleScore" class="form-control" />
+                <span asp-validation-for="BattleScore" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="emailAddress" class="control-label"></label>
-                <input asp-for="emailAddress" class="form-control" />
-                <span asp-validation-for="emailAddress" class="text-danger"></span>
+                <label asp-for="SportsmanshipScore" class="control-label"></label>
+                <input asp-for="SportsmanshipScore" class="form-control" />
+                <span asp-validation-for="SportsmanshipScore" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="notes" class="control-label"></label>
-                <textarea asp-for="notes" class="form-control" /></textarea>
-                <span asp-validation-for="notes" class="text-danger"></span>
+                <label asp-for="Army" class="control-label"></label>
+                <input asp-for="Army" class="form-control" />
+                <span asp-validation-for="Army" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <div class="checkbox">
                     <label>
-                        <input asp-for="hasPaid" /> @Html.DisplayNameFor(model => model.hasPaid)
+                        <input asp-for="Active" /> @Html.DisplayNameFor(model => model.Active)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="EmailAddress" class="control-label"></label>
+                <input asp-for="EmailAddress" class="form-control" />
+                <span asp-validation-for="EmailAddress" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Notes" class="control-label"></label>
+                <input asp-for="Notes" class="form-control" />
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Paid" /> @Html.DisplayNameFor(model => model.Paid)
                     </label>
                 </div>
             </div>

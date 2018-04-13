@@ -12,39 +12,57 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.firstName)
+            @Html.DisplayNameFor(model => model.Name)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.firstName)
+            @Html.DisplayFor(model => model.Name)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.lastName)
+            @Html.DisplayNameFor(model => model.BattleScore)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.lastName)
+            @Html.DisplayFor(model => model.BattleScore)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.emailAddress)
+            @Html.DisplayNameFor(model => model.SportsmanshipScore)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.emailAddress)
+            @Html.DisplayFor(model => model.SportsmanshipScore)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.notes)
+            @Html.DisplayNameFor(model => model.Army)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.notes)
+            @Html.DisplayFor(model => model.Army)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.hasPaid)
+            @Html.DisplayNameFor(model => model.Active)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.hasPaid)
+            @Html.DisplayFor(model => model.Active)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.EmailAddress)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.EmailAddress)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Notes)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Notes)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Paid)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Paid)
         </dd>
     </dl>
     
     <form asp-action="Delete">
-        <input type="hidden" asp-for="id" />
+        <input type="hidden" asp-for="Id" />
         <input type="submit" value="Delete" class="btn btn-default" /> |
         <a asp-action="Index">Back to List</a>
     </form>

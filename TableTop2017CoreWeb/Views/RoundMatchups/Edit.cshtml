@@ -9,42 +9,77 @@
 <h4>RoundMatchups</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <dt>
-            @Html.DisplayNameFor(model => model.player.firstName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.player.firstName)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.player.lastName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.player.lastName)
-        </dd>
+    <div class="col-md-12 mt-sm">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="id" />
-            <div class="form-group">
-                <label asp-for="roundNo" class="control-label"></label>
-                <input asp-for="roundNo" class="form-control" />
-                <span asp-validation-for="roundNo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="battleScore" class="control-label"></label>
-                <input asp-for="battleScore" class="form-control" />
-                <span asp-validation-for="battleScore" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="sportsmanshipPoints" class="control-label"></label>
-                <input asp-for="sportsmanshipPoints" class="form-control" />
-                <span asp-validation-for="sportsmanshipPoints" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="table" class="control-label"></label>
-                <input asp-for="table" class="form-control" />
-                <span asp-validation-for="table" class="text-danger"></span>
-            </div>
+            <input type="hidden" asp-for="Id" />
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayFor(model => model.RoundNo)
+                        </th>
+                        <th>
+                            @Html.DisplayFor(model => model.PlayerOne.Name)
+                            @Html.DisplayNameFor(model => model.PlayerOneSportsmanshipScore)
+                        </th>
+                        <th>
+                            @Html.DisplayFor(model => model.PlayerOne.Name)
+                            @Html.DisplayNameFor(model => model.PlayerOneBattleScore)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Table)
+                        </th>
+                        <th>
+                            @Html.DisplayFor(model => model.PlayerTwo.Name)
+                            @Html.DisplayNameFor(model => model.PlayerTwoBattleScore)
+                        </th>
+                        <th>
+                            @Html.DisplayFor(model => model.PlayerTwo.Name)
+                            @Html.DisplayNameFor(model => model.PlayerTwoSportsmanshipScore)
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            @Html.DisplayNameFor(model => model.RoundNo);
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <label asp-for="PlayerOneSportsmanshipScore" class="control-label"></label>
+                                <input asp-for="PlayerOneSportsmanshipScore" class="form-control" />
+                                <span asp-validation-for="PlayerOneSportsmanshipScore" class="text-danger"></span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <label asp-for="PlayerOneBattleScore" class="control-label"></label>
+                                <input asp-for="PlayerOneBattleScore" class="form-control" />
+                                <span asp-validation-for="PlayerOneBattleScore" class="text-danger"></span>
+                            </div>
+                        </td>
+                        <td>
+                            @Html.DisplayNameFor(model => model.Table);
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <label asp-for="PlayerTwoBattleScore" class="control-label"></label>
+                                <input asp-for="PlayerTwoBattleScore" class="form-control" />
+                                <span asp-validation-for="PlayerTwoBattleScore" class="text-danger"></span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <label asp-for="PlayerTwoSportsmanshipScore" class="control-label"></label>
+                                <input asp-for="PlayerTwoSportsmanshipScore" class="form-control" />
+                                <span asp-validation-for="PlayerTwoSportsmanshipScore" class="text-danger"></span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-default" />
             </div>
