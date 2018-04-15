@@ -8,24 +8,19 @@ using System.Threading.Tasks;
 namespace TableTop2017CoreWeb.Models
 {
     public class Player {
-        public int id { get; set; }
-        [DisplayName("First Name")]
-        public string firstName { get; set; }
-        [DisplayName("Last Name")]
-        public string lastName { get; set; }
-
+        public int Id { get; set; }
+        [DisplayName("Name")]
+        public string Name { get; set; }
+        public string Army { get; set; }
+        public Boolean Active { get; set; }
         [DisplayName("Email Address")]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
-        public string emailAddress { get; set; }
-
-        [DisplayName("Notes")]
-        public string notes { get; set; }
-        [DisplayName("Paid")]
-        public Boolean hasPaid { get; set; }
-        public int roundBattleScore { get; set; }
+        public string EmailAddress { get; set; }
+        public string Notes { get; set; }
+        public Boolean Paid { get; set; }
         [DisplayName("BattleScore")]
-        public int totalBattleScore { get; set; }
-        public int sportsmanshipScore { get; set; }
-        public Player currentOpponent { get; set; }
+        public int BattleScore { get; set; }
+        public int SportsmanshipScore { get; set; }
+        public Player CurrentOpponent { get; set; }
     }
 }

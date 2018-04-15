@@ -28,22 +28,28 @@
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.firstName)
+                    @Html.DisplayNameFor(model => model.Name)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.lastName)
+                    @Html.DisplayNameFor(model => model.BattleScore)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.totalBattleScore)
+                    @Html.DisplayNameFor(model => model.SportsmanshipScore)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.emailAddress)
+                    @Html.DisplayNameFor(model => model.Army)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.notes)
+                    @Html.DisplayNameFor(model => model.Active)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.hasPaid)
+                    @Html.DisplayNameFor(model => model.EmailAddress)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Notes)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Paid)
                 </th>
                 <th></th>
             </tr>
@@ -51,31 +57,37 @@
         <tbody>
             @foreach (var item in Model)
             {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.firstName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.lastName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.totalBattleScore)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.emailAddress)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.notes)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.hasPaid)
-                    </td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.id">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.id">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.id">Delete</a>
-                    </td>
-                </tr>
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BattleScore)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SportsmanshipScore)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Army)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Active)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EmailAddress)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Notes)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Paid)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
             }
         </tbody>
     </table>
