@@ -12,15 +12,22 @@ namespace TableTop2017CoreWeb.Models
         [DisplayName("Name")]
         public string Name { get; set; }
         public string Army { get; set; }
-        public Boolean Active { get; set; }
+        public Boolean Active { get; set; } 
         [DisplayName("Email Address")]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string EmailAddress { get; set; }
         public string Notes { get; set; }
         public Boolean Paid { get; set; }
         [DisplayName("BattleScore")]
-        public int BattleScore { get; set; }
+        public int BattleScore { get; set; } 
         public int SportsmanshipScore { get; set; }
         public Player CurrentOpponent { get; set; }
+
+        public Player()
+        {
+            Active = true;
+            BattleScore = 0;
+            SportsmanshipScore = 0;
+        }
     }
 }

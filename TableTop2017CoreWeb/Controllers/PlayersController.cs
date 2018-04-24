@@ -67,7 +67,8 @@ namespace TableTop2017CoreWeb.Controllers
         // GET: Players/Create
         public IActionResult Create()
         {
-            return View();
+            Player player = new Player();
+            return View(player);
         }
 
         // POST: Players/Create
