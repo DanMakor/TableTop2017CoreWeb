@@ -26,26 +26,6 @@ namespace TableTop2017CoreWeb.Controllers
             return View(players);
         }
 
-        public async Task<IActionResult> UpdateBattleScores()
-        {
-            List<RoundMatchups> roundMatchups = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).ToListAsync();
-            foreach (RoundMatchups roundmatchup in roundMatchups)
-            {
-                Player playerOne = roundmatchup.PlayerOne;
-                playerOne.BattleScore += roundmatchup.PlayerOneBattleScore;
-                Player playerTwo = roundmatchup.PlayerTwo;
-                playerTwo.BattleScore += roundmatchup.PlayerTwoBattleScore;
-                _context.Update(playerOne);
-                _context.Update(playerTwo);
-            }
-            if (ModelState.IsValid)
-            {
-                await _context.SaveChangesAsync();
-            }
-
-            return RedirectToAction("Index");
-        }
-
         // GET: Players/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -171,6 +151,42 @@ namespace TableTop2017CoreWeb.Controllers
         {
             return _context.Players.Any(e => e.Id == id);
         }
- 
+
+        public int GetPlayerBattleScore(int? id)
+        {
+            if (id == null)
+            {
+                NotFound();
+            }
+            int[] posOneScores = _context.RoundMatchups.Where(p => p.PlayerOne.Id == id).Select(p => p.PlayerOneBattleScore).ToArray();
+            int[] posTwoScores = _context.RoundMatchups.Where(p => p.PlayerTwo.Id == id).Select(p => p.PlayerTwoBattleScore).ToArray();
+            return posOneScores.Sum() + posTwoScores.Sum();
+        }
+
+        public void SetAllPlayerBattleScores()
+        {
+            Dictionary<Player, int> playerBattleScores = new Dictionary<Player, int>();
+            List<Player> players = _context.Players.ToList();
+            foreach (Player player in players)
+            {
+                playerBattleScores.Add(player, 0);
+            }
+            List<RoundMatchups> roundMatchups = _context.RoundMatchups.ToList();
+            foreach (RoundMatchups roundMatchup in roundMatchups)
+            {
+                playerBattleScores[roundMatchup.PlayerOne] += roundMatchup.PlayerOneBattleScore;
+                playerBattleScores[roundMatchup.PlayerTwo] += roundMatchup.PlayerTwoBattleScore;
+            }
+            foreach (KeyValuePair<Player, int> playerBattleScore in playerBattleScores)
+            {
+                playerBattleScore.Key.BattleScore = playerBattleScore.Value;
+                _context.Update(playerBattleScore.Key);
+            }
+            if (ModelState.IsValid)
+            {
+                _context.SaveChanges();
+            }
+        } 
+
     }
 }

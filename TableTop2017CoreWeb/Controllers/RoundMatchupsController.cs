@@ -33,12 +33,13 @@ namespace TableTop2017CoreWeb.Controllers
                 _context.Remove(roundmatchup);
             }
             _context.SaveChanges();
+            SetAllPlayerBattleScores();
         }
 
         // GET: RoundMatchups
         public async Task<IActionResult> Index()
         {
-            int currentRound = GetCurrentRound();
+            int currentRound = await GetCurrentRound();
             List<RoundMatchups> roundMatchups = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Where(r => r.RoundNo == currentRound).OrderByDescending(r => r.PlayerOne.BattleScore).ToListAsync();
             return View(roundMatchups);
         }
@@ -46,19 +47,100 @@ namespace TableTop2017CoreWeb.Controllers
         // GET: AdminMatchups
         public async Task<IActionResult> Admin()
         {
-            int currentRound = GetCurrentRound();
+            int currentRound = await GetCurrentRound();
+            List<RoundMatchups> roundMatchups = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Where(r => r.RoundNo == currentRound).OrderByDescending(r => r.PlayerOne.BattleScore).ToListAsync();
+            TempData["DuplicatePlayers"] = null;
+            TempData["OverallocatedPlayers"] = null;
+            TempData["UnallocatedPlayers"] = null;
+
+            return View(roundMatchups);
+        }
+
+        // GET: RoundMatchups Results
+        public async Task<IActionResult> Results()
+        {
+            int currentRound = await GetCurrentRound();
             List<RoundMatchups> roundMatchups = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Where(r => r.RoundNo == currentRound).OrderByDescending(r => r.PlayerOne.BattleScore).ToListAsync();
             return View(roundMatchups);
         }
 
+        // GET: Allrounds
+        public async Task<IActionResult> AllRounds()
+        {
+            List<RoundMatchups> roundMatchups = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).ToListAsync();
+            TempData["DuplicateOpponents"] = null;
+            return View(roundMatchups);
+        }
+
+        //GET: AllRoundsEdit
+        public async Task<IActionResult> AllRoundsEdit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var roundMatchup = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).SingleOrDefaultAsync(m => m.Id == id);
+            return View(roundMatchup);
+        }
+
+        //Update the Player Battlescores before redirecting to the player page
+        public ActionResult UpdateBattleScores()
+        {
+            SetAllPlayerBattleScores();
+            return RedirectToAction("Index", "Players");
+        }
+
+        //GET: ResultsEdit
+        public async Task<IActionResult> ResultsEdit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var roundMatchup = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).SingleOrDefaultAsync(m => m.Id == id);
+            return View(roundMatchup);
+        }
+
+        //POST: RoundMatchups Results
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResultsEdit(int id, [Bind("Id,RoundNo,PlayerOneId,PlayerTwoId,PlayerOneBattleScore,PlayerTwoBattleScore,PlayerOneSportsmanshipScore,PlayerTwoSportsmanshipScore,Table")] RoundMatchups roundMatchup)
+        {
+            if (id != roundMatchup.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(roundMatchup);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!RoundMatchupsExists(roundMatchup.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Results));
+            }
+            return View(roundMatchup);
+        }
 
         //Generate the RoundMatchups 
-
-        public async Task<IActionResult> GenerateRoundMatchups()
+        public ActionResult GenerateRoundMatchups()
         {
             GenerateRoundMatchupsAlgorithm();
-            return RedirectToAction(nameof(Index));
-
+            return RedirectToAction("Admin");
         }
 
         // GET: RoundMatchups/Details/5
@@ -126,8 +208,7 @@ namespace TableTop2017CoreWeb.Controllers
             return View(aevm);
         }
 
-        //POST: AdminEdit
-
+        //POST: AdminEdit 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AdminEdit(int id, [Bind("Id,PlayerOneId,PlayerTwoId")] AdminEditRoundMatchupsViewModel roundMatchup)
@@ -167,7 +248,7 @@ namespace TableTop2017CoreWeb.Controllers
         //Validate The Matchups after they have been changed on the admin page 
         public async Task<IActionResult> ValidateMatchups()
         {
-            int currentRound = GetCurrentRound();
+            int currentRound = await GetCurrentRound();
             List<RoundMatchups> roundMatchups = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Where(r => r.RoundNo == currentRound).OrderByDescending(r => r.PlayerOne.BattleScore).ToListAsync();
 
             List<String> duplicatePlayers = new List<String>();
@@ -232,14 +313,14 @@ namespace TableTop2017CoreWeb.Controllers
         //Reset the matchups 
         public async Task<IActionResult> ResetMatchups()
         {
-            int roundNo = GetCurrentRound();
+            int roundNo = await GetCurrentRound();
             foreach (RoundMatchups roundMatchup in _context.RoundMatchups.Where(r => r.RoundNo == roundNo).ToList())
             {
                 _context.Remove(roundMatchup);
             }
             await _context.SaveChangesAsync();
             GenerateRoundMatchupsAlgorithm();
-            return RedirectToAction(nameof(Admin));
+            return RedirectToAction("Admin");
         }
 
         // GET: RoundMatchups/Edit/5
@@ -335,11 +416,13 @@ namespace TableTop2017CoreWeb.Controllers
                 if (roundMatchup.PlayerOne == player)
                 {
                     opponents.Add(roundMatchup.PlayerTwo);
+                } else if (roundMatchup.PlayerTwo == player)
+                {
+                    opponents.Add(roundMatchup.PlayerOne);
                 }
             }
             return opponents;
         }
-
 
         //Returns a table to be assigned to a matchup. Also keeps a record of allocated tables for round. 
         public int AllocateTable(List<int> tables, List<int> allocated)
@@ -415,17 +498,43 @@ namespace TableTop2017CoreWeb.Controllers
             //Where(r => r.roundNo == currentRound);
             return tables;
         }
-        public int GetCurrentRound()
+
+        public async Task<int> GetCurrentRound()
         {
             int currentRound = 1;
-            if (_context.RoundMatchups.LastOrDefault() != null)
+            RoundMatchups lastRound = _context.RoundMatchups.LastOrDefault();
+            if ( lastRound != null)
             {
-                currentRound = _context.RoundMatchups.Last().RoundNo;
+                currentRound = lastRound.RoundNo;
             }
             return currentRound;
         }
 
-        public async void GenerateRoundMatchupsAlgorithm()
+        public ActionResult ValidateAllMatchups()
+        {
+            TempData["DuplicateOpponents"] = ValidateMatchupOpponents();
+            return View("AllRounds", _context.RoundMatchups.ToList());
+        }
+
+        public Dictionary<Player, List<Player>> ValidateMatchupOpponents()
+        {
+            List<Player> players = _context.Players.ToList();
+            Dictionary<Player, List<Player>> duplicateOpponents = new Dictionary<Player, List<Player>>();
+            foreach (Player player in players)
+            {
+                List<Player> opponents = getAllOpponents(player);
+                var duplicates = opponents
+                    .GroupBy(i => i)
+                    .Where(g => g.Count() > 1)
+                    .Select(g => g.Key)
+                    .ToList();
+                duplicateOpponents[player] = duplicates;
+            }
+
+            return duplicateOpponents;
+        }
+
+        public void GenerateRoundMatchupsAlgorithm()
         {
             List<Player> players = _context.Players.OrderByDescending(p => p.BattleScore).ToList();
             List<int> AllocatedTables = new List<int>(GetnoOfTables());
@@ -433,7 +542,7 @@ namespace TableTop2017CoreWeb.Controllers
             int i = 0;
             while (i < players.Count)
             {
-                //Skip this player if they are already allocated a player
+                //Skip this player if they are already allocated an opponent
                 if (players[i].CurrentOpponent == null)
                 {
                     if (secondaryIndex == 0) { secondaryIndex = i + 1; }
@@ -549,10 +658,34 @@ namespace TableTop2017CoreWeb.Controllers
             }
             if (ModelState.IsValid)
             {
-                await _context.SaveChangesAsync();
+                 _context.SaveChanges();
             }
 
         }
 
+        public void SetAllPlayerBattleScores()
+        {
+            Dictionary<Player, int> playerBattleScores = new Dictionary<Player, int>();
+            List<Player> players = _context.Players.ToList();
+            List<RoundMatchups> roundMatchups = _context.RoundMatchups.ToList();
+            foreach (Player player in players)
+            {
+                playerBattleScores.Add(player, 0);
+            }
+            foreach (RoundMatchups roundMatchup in roundMatchups)
+            {
+                playerBattleScores[roundMatchup.PlayerOne] += roundMatchup.PlayerOneBattleScore;
+                playerBattleScores[roundMatchup.PlayerTwo] += roundMatchup.PlayerTwoBattleScore;
+            }
+            foreach (KeyValuePair<Player, int> playerBattleScore in playerBattleScores)
+            {
+                playerBattleScore.Key.BattleScore = playerBattleScore.Value;
+                _context.Update(playerBattleScore.Key);
+            }
+            if (ModelState.IsValid)
+            {
+                _context.SaveChanges();
+            }
+        }
     }
 }
