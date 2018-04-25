@@ -12,8 +12,10 @@
 
 <div class="row mt-sm">
     <div class="col-md-3">
-        <label class="col-form-label" for="noOfTables"><h4 class="text-primary">Number of Tables</h4></label>
-        <input type="number" min="1" max="100" value="1" class="form-control" id="noOfTables"></input>
+        <form name="Tables" action="#">
+            <label class="col-form-label" for="noOfTables"><h4 class="text-primary">Number of Tables</h4></label>
+            <input type="number" min="1" max="100" value="5" class="form-control" id="noOfTables" />
+        </form>
     </div>
 
     <div class="col-md-3">
@@ -81,7 +83,7 @@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Paid)
-                </td>
+                </td>     
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |

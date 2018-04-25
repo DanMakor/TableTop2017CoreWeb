@@ -17,14 +17,14 @@
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div hidden class="form-group">
                 <label asp-for="BattleScore" class="control-label"></label>
-                <input asp-for="BattleScore" class="form-control" />
+                <input asp-for="BattleScore" value="0" class="form-control" />
                 <span asp-validation-for="BattleScore" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div hidden class="form-group">
                 <label asp-for="SportsmanshipScore" class="control-label"></label>
-                <input asp-for="SportsmanshipScore" class="form-control" />
+                <input asp-for="SportsmanshipScore" value="0" class="form-control" />
                 <span asp-validation-for="SportsmanshipScore" class="text-danger"></span>
             </div>
             <div class="form-group">

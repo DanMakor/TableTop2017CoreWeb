@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -14,6 +14,7 @@ using TableTop2017CoreWeb.Models;
 
 namespace TableTop2017CoreWeb.Controllers
 {
+
     public class RoundMatchupsController : Controller
     {
 
@@ -136,7 +137,6 @@ namespace TableTop2017CoreWeb.Controllers
         }
 
         //Generate the RoundMatchups 
-
         public ActionResult GenerateRoundMatchups()
         {
             GenerateRoundMatchupsAlgorithm();
@@ -151,7 +151,7 @@ namespace TableTop2017CoreWeb.Controllers
                 return NotFound();
             }
 
-            var roundMatchups = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo)
+            var roundMatchups = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Include(r => r.Table)
                 .SingleOrDefaultAsync(m => m.Id == id);
             if (roundMatchups == null)
             {
@@ -331,7 +331,7 @@ namespace TableTop2017CoreWeb.Controllers
                 return NotFound();
             }
 
-            var roundMatchups = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).SingleOrDefaultAsync(m => m.Id == id);
+            var roundMatchups = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Include(r => r.Table).SingleOrDefaultAsync(m => m.Id == id);
             if (roundMatchups == null)
             {
                 return NotFound();
@@ -382,7 +382,7 @@ namespace TableTop2017CoreWeb.Controllers
                 return NotFound();
             }
 
-            var roundMatchups = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo)
+            var roundMatchups = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Include(r => r.Table)
                 .SingleOrDefaultAsync(m => m.Id == id);
             if (roundMatchups == null)
             {
@@ -424,6 +424,81 @@ namespace TableTop2017CoreWeb.Controllers
             return opponents;
         }
 
+        //Returns a table to be assigned to a matchup. Also keeps a record of allocated tables for round. 
+        public int AllocateTable(List<int> tables, List<int> allocated)
+        {
+            var isAvailable = true;
+            
+            foreach (int tableNo in tables)
+            {
+                isAvailable = true;
+                for (int i = 0; i < allocated.Count; i++)
+                {
+
+                    if (allocated[i] == tableNo)
+                    {
+                        Debug.WriteLine("THIS IS THE ALLOCATED[i]----))*  \n" + allocated[i]);
+                        isAvailable = false;
+                    }
+                }
+                if (isAvailable == true)
+                {
+                    allocated.Add(tableNo);
+                    return tableNo;
+                }
+              
+            }
+            //At the moment this is just to return a number when there are no more possible combinations for players and tables
+            return 999;
+            
+        }
+        public int GetnoOfTables()
+        {
+            
+           // var TableNumber = object.getElementById("noOfTables");
+
+            return 5;
+        }
+        //returns a list of available tables that the player has not played on
+        public List<int> GetTables(Player currentPlayer)
+        {
+
+            // List<int> tables = _context.RoundMatchups.Where(a => a.PlayerOne == currentPlayer || a.PlayerOne.CurrentOpponent == currentPlayer).Select(a => a.Table).ToList();
+            List<int> tables = new List<int>();
+            List <RoundMatchups> roundMatchups = _context.RoundMatchups.ToList();
+            int currentRound = 1;
+            if (_context.RoundMatchups.LastOrDefault() != null)
+            {
+                currentRound = _context.RoundMatchups.Last().RoundNo+1;
+            }
+            
+                //adds all tables to list
+                for (int j = 1; j <= GetnoOfTables(); j++)
+                {
+                    tables.Add(j);
+                }
+            if (currentRound < 2)
+                return tables;
+            else
+            {
+                //List<int> temp = _context.RoundMatchups.Where(a => a.PlayerOne == currentPlayer || a.PlayerTwo == currentPlayer).Select(a => a.Table).ToList();
+               // tables = (List<int>)tables.Except(temp); // returns all the firms except those in _context.RoundMatchups.Where(Ect..)
+                //*
+                foreach (var roundMatchup in roundMatchups)
+                {
+                    if (roundMatchup.PlayerOne == currentPlayer || roundMatchup.PlayerTwo == currentPlayer || currentPlayer.CurrentOpponent ==roundMatchup.PlayerOne || currentPlayer.CurrentOpponent == roundMatchup.PlayerTwo)
+                    {
+                        tables.Remove(roundMatchup.Table);
+                    }
+                }
+                //*/
+               
+            }
+            
+            //Where(r => r.roundNo == currentRound);
+            return tables;
+        }
+
         public async Task<int> GetCurrentRound()
         {
             int currentRound = 1;
@@ -462,6 +537,7 @@ namespace TableTop2017CoreWeb.Controllers
         public void GenerateRoundMatchupsAlgorithm()
         {
             List<Player> players = _context.Players.OrderByDescending(p => p.BattleScore).ToList();
+            List<int> AllocatedTables = new List<int>(GetnoOfTables());
             int secondaryIndex = 0;
             int i = 0;
             while (i < players.Count)
@@ -568,6 +644,10 @@ namespace TableTop2017CoreWeb.Controllers
                         PlayerOne = player,
                         PlayerTwo = player.CurrentOpponent
                     };
+                    
+                    //allocates table for matchup
+                    roundMatchup.Table = AllocateTable(GetTables(player), AllocatedTables);
+                    
                     _context.Add(roundMatchup);
                 }
             }
@@ -580,6 +660,7 @@ namespace TableTop2017CoreWeb.Controllers
             {
                  _context.SaveChanges();
             }
+
         }
 
         public void SetAllPlayerBattleScores()

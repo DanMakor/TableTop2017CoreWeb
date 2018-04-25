@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <UserSecretsId>aspnet-TableTop2017CoreWeb-329FA077-8076-408C-9416-E65146F8951A</UserSecretsId>
+    <Authors>Daniel; Stephen</Authors>
   </PropertyGroup>
 
 
