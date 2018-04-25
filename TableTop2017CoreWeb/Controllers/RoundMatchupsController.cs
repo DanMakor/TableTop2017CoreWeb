@@ -298,16 +298,16 @@ namespace TableTop2017CoreWeb.Controllers
                 if (entry.Value < 1) { unallocatedPlayers.Add(entry.Key); }
             }
 
-            TempData["DuplicatePlayers"] = duplicatePlayers;
-            TempData["OverallocatedPlayers"] = overallocatedPlayers;
-            TempData["UnallocatedPlayers"] = unallocatedPlayers;
+            if (duplicatePlayers.Count() > 0) { TempData["DuplicatePlayers"] = duplicatePlayers; } else { TempData["DuplicatePlayers"] = null; }
+            if (overallocatedPlayers.Count() > 0) { TempData["OverallocatedPlayers"] = overallocatedPlayers; } else { TempData["OverallocatedPlayers"] = null; }
+            if (unallocatedPlayers.Count() > 0) { TempData["UnallocatedPlayers"] = unallocatedPlayers; } else { TempData["UnallocatedPlayers"] = null; }
 
             if (duplicatePlayers.Count == 0 && overallocatedPlayers.Count == 0 && unallocatedPlayers.Count == 0)
             {
-                return RedirectToAction(nameof(Index));
+                TempData["Status"] = "No issues!";
             }
 
-            return View("Admin", roundMatchups);
+            return View(nameof(Admin), roundMatchups);
         }
         
         //Reset the matchups 
@@ -320,7 +320,7 @@ namespace TableTop2017CoreWeb.Controllers
             }
             await _context.SaveChangesAsync();
             GenerateRoundMatchupsAlgorithm();
-            return RedirectToAction("Admin");
+            return RedirectToAction(nameof(Admin));
         }
 
         // GET: RoundMatchups/Edit/5
@@ -455,7 +455,7 @@ namespace TableTop2017CoreWeb.Controllers
         public int GetnoOfTables()
         {
             
-           // var TableNumber = object.getElementById("noOfTables");
+            // var TableNumber = object.getElementById("noOfTables");
 
             return 5;
         }

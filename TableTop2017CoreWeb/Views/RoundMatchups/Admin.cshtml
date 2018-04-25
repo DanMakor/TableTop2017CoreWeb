@@ -5,6 +5,7 @@
     var OverallocatedPlayers = (List<string>)TempData["OverallocatedPlayers"];
     var UnallocatedPlayers = (List<string>)TempData["UnallocatedPlayers"];
     var DuplicatePlayers = (List<string>)TempData["DuplicatePlayers"];
+    var Status = (string)TempData["Status"];
 }
 
 <h2>View</h2>
@@ -78,35 +79,40 @@
     </tbody>
 </table>
 
-@Html.ActionLink("Show Matchups", "ValidateMatchups", "RoundMatchups", null, new { @class = "btn btn-primary" })
+@Html.ActionLink("Confirm Matchups", "", "RoundMatchups", null, new { @class = "btn btn-primary" })
+@Html.ActionLink("Validate Matchups", "ValidateMatchups", "RoundMatchups", null, new { @class = "btn btn-primary" })
 @Html.ActionLink("Reset Matchups", "ResetMatchups", "RoundMatchups", null, new { @class = "btn btn-primary" })
 
 <div class="mt-xs">
+    @if (Status != "")
+    {
+        <p class="alert-success">@Status</p>
+    }
     @if (OverallocatedPlayers != null && OverallocatedPlayers.Count != 0)
     {
         <p class="alert-danger">
             <span>
                 @foreach (string player in OverallocatedPlayers)
                 {@player <span>, </span>}
-        </span> has been allocated more than one opponent
-    </p>
-}
+            </span> has been allocated more than one opponent
+        </p>
+    }
     @if (UnallocatedPlayers != null && UnallocatedPlayers.Count != 0)
     {
         <p class="alert-danger">
             <span>
                 @foreach (string player in UnallocatedPlayers)
                 {@player <span>, </span>}
-        </span> has not been allocated an opponent
-    </p>
-}
+            </span> has not been allocated an opponent
+        </p>
+    }
     @if (DuplicatePlayers != null && DuplicatePlayers.Count != 0)
     {
         <p class="alert-danger">
             <span>
                 @foreach (string player in DuplicatePlayers)
                 {@player <span>, </span>}
-        </span> has been matched against themselves
-    </p>
-}
+            </span> has been matched against themselves
+        </p>
+    }
 </div>
