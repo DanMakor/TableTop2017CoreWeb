@@ -72,4 +72,8 @@
     </tbody>
 </table>
 
-@Html.ActionLink("Confirm Matchups", "UpdateBattleScores", "RoundMatchups", null, new { @class = "btn btn-primary" })
+@Html.ActionLink("Back To Players", "UpdateBattleScores", "RoundMatchups", null, new { @class = "btn btn-primary" })
+
+<div class="col-md-3 mt-sm">
+    @Html.ActionLink("Generate Next Round", "GenerateRoundMatchups", "RoundMatchups", null, new { @class = "btn btn-primary" })
+</div>

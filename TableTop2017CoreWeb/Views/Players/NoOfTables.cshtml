@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TableTop2017CoreWeb.Models.Player>
+﻿@model IEnumerable<TableTop2017CoreWeb.Models.NoOfTablesModel>
 
 
 @{
@@ -12,9 +12,17 @@
 
 <div class="row mt-sm">
     <div class="col-md-3">
-        <form name="Tables" action="#">
-            <label class="col-form-label" for="noOfTables"><h4 class="text-primary">Number of Tables</h4></label>
-            <input type="number" min="1" max="100" value="5" class="form-control" id="noOfTables" />
+        <form asp-action="Admin">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="NoOfTables" class="control-label"></label>
+                <input asp-for="NoOfTables" class="form-control" />
+                <span asp-validation-for="NoOfTables" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
         </form>
     </div>
 
@@ -57,7 +65,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @foreach (var item in Model.Players)
             {
                 <tr>
                     <td>
@@ -86,6 +94,7 @@
                     </td>
                     <td>
                         <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                         <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
                     </td>
                 </tr>

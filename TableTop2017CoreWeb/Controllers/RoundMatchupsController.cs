@@ -198,7 +198,8 @@ namespace TableTop2017CoreWeb.Controllers
             {
                 Id = roundMatchup.Id,
                 PlayerOneId = roundMatchup.PlayerOne.Id,
-                PlayerTwoId = roundMatchup.PlayerTwo.Id
+                PlayerTwoId = roundMatchup.PlayerTwo.Id,
+                TableNo = roundMatchup.Table
             };
             if (aevm.RoundMatchup == null)
             {
@@ -211,7 +212,7 @@ namespace TableTop2017CoreWeb.Controllers
         //POST: AdminEdit 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AdminEdit(int id, [Bind("Id,PlayerOneId,PlayerTwoId")] AdminEditRoundMatchupsViewModel roundMatchup)
+        public async Task<IActionResult> AdminEdit(int id, [Bind("Id,PlayerOneId,PlayerTwoId,TableNo")] AdminEditRoundMatchupsViewModel roundMatchup)
         {
             if (id != roundMatchup.Id)
             {
@@ -221,6 +222,7 @@ namespace TableTop2017CoreWeb.Controllers
             RoundMatchups updatedRoundMatchup = _context.RoundMatchups.Find(id);
             updatedRoundMatchup.PlayerOne = _context.Players.FirstOrDefault(p => p.Id == roundMatchup.PlayerOneId);
             updatedRoundMatchup.PlayerTwo = _context.Players.FirstOrDefault(p => p.Id == roundMatchup.PlayerTwoId);
+            updatedRoundMatchup.Table = roundMatchup.TableNo;
 
             if (ModelState.IsValid)
             {
@@ -298,16 +300,16 @@ namespace TableTop2017CoreWeb.Controllers
                 if (entry.Value < 1) { unallocatedPlayers.Add(entry.Key); }
             }
 
-            TempData["DuplicatePlayers"] = duplicatePlayers;
-            TempData["OverallocatedPlayers"] = overallocatedPlayers;
-            TempData["UnallocatedPlayers"] = unallocatedPlayers;
+            if (duplicatePlayers.Count() > 0) { TempData["DuplicatePlayers"] = duplicatePlayers; } else { TempData["DuplicatePlayers"] = null; }
+            if (overallocatedPlayers.Count() > 0) { TempData["OverallocatedPlayers"] = overallocatedPlayers; } else { TempData["OverallocatedPlayers"] = null; }
+            if (unallocatedPlayers.Count() > 0) { TempData["UnallocatedPlayers"] = unallocatedPlayers; } else { TempData["UnallocatedPlayers"] = null; }
 
             if (duplicatePlayers.Count == 0 && overallocatedPlayers.Count == 0 && unallocatedPlayers.Count == 0)
             {
-                return RedirectToAction(nameof(Index));
+                TempData["Status"] = "No issues!";
             }
 
-            return View("Admin", roundMatchups);
+            return View(nameof(Admin), roundMatchups);
         }
         
         //Reset the matchups 
@@ -320,7 +322,7 @@ namespace TableTop2017CoreWeb.Controllers
             }
             await _context.SaveChangesAsync();
             GenerateRoundMatchupsAlgorithm();
-            return RedirectToAction("Admin");
+            return RedirectToAction(nameof(Admin));
         }
 
         // GET: RoundMatchups/Edit/5
@@ -437,7 +439,7 @@ namespace TableTop2017CoreWeb.Controllers
 
                     if (allocated[i] == tableNo)
                     {
-                        Debug.WriteLine("THIS IS THE ALLOCATED[i]----))*  \n" + allocated[i]);
+                        
                         isAvailable = false;
                     }
                 }
@@ -448,6 +450,43 @@ namespace TableTop2017CoreWeb.Controllers
                 }
               
             }
+            //if unble to allocate a table that has not been played on then a random table will be assigned
+            if (allocated.Count > 0)
+            {
+              
+               // Debug.WriteLine("THIS IS THE ALLOCATED.Count----))*  \n" + allocated.Count);
+                
+                
+                for (int i = 1; i <= GetnoOfTables(); i++)
+                {
+                    isAvailable = true;
+                    foreach (int table in allocated)
+                    {
+
+                        if (i == table)
+                        {
+
+                            isAvailable = false;
+                        }
+                    }
+                    if (isAvailable == true)
+                    {
+                        allocated.Add(i);
+                        return i;
+                    }
+                }
+                
+
+                
+            }
+            else
+            {
+                Random r = new Random();
+                int i = r.Next(1, GetnoOfTables());
+                allocated.Add(i);
+                return i;
+            }
+
             //At the moment this is just to return a number when there are no more possible combinations for players and tables
             return 999;
             
@@ -455,7 +494,7 @@ namespace TableTop2017CoreWeb.Controllers
         public int GetnoOfTables()
         {
             
-           // var TableNumber = object.getElementById("noOfTables");
+            // var TableNumber = object.getElementById("noOfTables");
 
             return 5;
         }
@@ -495,6 +534,8 @@ namespace TableTop2017CoreWeb.Controllers
                
             }
             
+
+
             //Where(r => r.roundNo == currentRound);
             return tables;
         }
@@ -687,5 +728,5 @@ namespace TableTop2017CoreWeb.Controllers
                 _context.SaveChanges();
             }
         }
-    } //Fixed?
+    } 
 }
