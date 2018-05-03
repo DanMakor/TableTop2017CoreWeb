@@ -89,6 +89,13 @@ namespace TableTop2017CoreWeb.Controllers
             SetAllPlayerBattleScores();
             return RedirectToAction("Index", "Players");
         }
+        //Update the Player Battlescores before redirecting to the player page
+        public ActionResult UpdateBattleScoresContinue(String page)
+        {
+            SetAllPlayerBattleScores();
+            GenerateRoundMatchupsAlgorithm();
+            return RedirectToAction(page, "RoundMatchups");
+        }
 
         //GET: ResultsEdit
         public async Task<IActionResult> ResultsEdit(int? id)
