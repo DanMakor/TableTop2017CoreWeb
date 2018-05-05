@@ -13,5 +13,6 @@ namespace TableTop2017CoreWeb.Models
         public int PlayerOneId { get; set; }
         [DisplayName("Player Two")]
         public int PlayerTwoId { get; set; }
+        public int TableNo { get; set; }
     }
 }

@@ -24,5 +24,6 @@ namespace TableTop2017CoreWeb.Models
         [DisplayName("Sportsmanship Grade")]
         public string PlayerTwoSportsmanshipScore { get; set; }
         public int Table { get; set; }
+
     }
 }
