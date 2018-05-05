@@ -621,7 +621,8 @@ namespace TableTop2017CoreWeb.Controllers
                             /**
                              * Following block is to deallocate the next lowest ranked allocated pair
                              **/
-                            if (s == (players.Count - 1) && (players[i].CurrentOpponent == null))
+                            if (players.Where(p => p.CurrentOpponent == null).LastOrDefault() == players[s] && (players[i].CurrentOpponent == null))
+                            //if (s == (players.Count - 1) && (players[i].CurrentOpponent == null))
                             {
                                 if (i - 1 >= 0)
                                 {
