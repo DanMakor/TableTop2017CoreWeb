@@ -1,0 +1,80 @@
+﻿@model TableTop2017CoreWeb.Models.AdminViewModel
+
+@{
+    ViewData["Title"] = "Matchups";
+}
+
+<h2>Admin</h2>
+
+@*<form asp-action="Admin">
+        <label asp-for="CurrentRound"></label>
+        <select id="round-number" asp-for="CurrentRound">
+            <option value="all" selected="@(Model.CurrentRound == "all")">All</option>
+            @foreach (int roundNo in Model.NoOfRounds)
+            {
+                <option value="@roundNo" selected="@(roundNo.ToString() == Model.CurrentRound)">@roundNo</option>
+            }
+        </select>
+        <span asp-validation-for="CurrentRound" class="text-danger"></span>
+        <div class="form-group">
+            <input type="submit" value="Save" class="btn btn-default" />
+        </div
+    </form>*@
+
+@{ var first = Model.RoundMatchup.FirstOrDefault(); }
+@if (first is PairRoundMatchup)
+{
+    <table class="table">
+        @Html.Partial("_PairRoundMatchupTableHead", first as PairRoundMatchup)
+        <tbody>
+            @foreach (PairRoundMatchup pairRoundMatchup in Model.RoundMatchup)
+            {
+                @Html.Partial("_PairRoundMatchupTableBodyItem", pairRoundMatchup);
+            }
+        </tbody>
+    </table>
+}
+else if (first is RoundMatchup)
+{
+    <table class="table">
+        @Html.Partial("_RoundMatchupTableHead", first)
+        <tbody>
+            @foreach (RoundMatchup roundMatchup in Model.RoundMatchup)
+            {
+                @Html.Partial("_RoundMatchupTableBodyItem", roundMatchup);
+            }
+        </tbody>
+    </table>
+}
+
+
+
+@Html.ActionLink("Confirm Matchups", "", "RoundMatchups", null, new { @class = "btn btn-primary" })
+@Html.ActionLink("Validate Matchups", "ValidateRoundMatchups", "Admin", first.RoundNo, new { @class = "btn btn-primary" })
+@Html.ActionLink("Reset Matchups", "ResetRoundMatchups", "Admin", null, new { @class = "btn btn-primary" })
+
+@if(ViewData["DuplicatePlayers"] != null || ViewData["DuplicateOpponents"] != null || ViewData["OverallocatedPlayers"] != null || ViewData["UnallocatedPlayers"] != null)
+{
+    <h4 class="alert-danger">
+        If there are errors not applicable to the current round, it is recommended you fix them in the All Rounds page before proceeding
+    </h4> 
+}
+
+<div class="mt-xs">
+    @if (ViewData["DuplicatePlayers"] != null)
+    {
+        <p class="text-danger">@ViewData["DuplicatePlayers"]</p>
+    }
+    @if (ViewData["DuplicateOpponents"] != null)
+    {
+        <p class="text-danger">@ViewData["DuplicateOpponents"]</p>
+    }
+    @if (ViewData["OverallocatedPlayers"] != null)
+    {
+        <p class="text-danger">@ViewData["OverallocatedPlayers"]</p>
+    }
+    @if (ViewData["UnallocatedPlayers"] != null)
+    {
+        <p class="text-danger">@ViewData["UnallocatedPlayers"]</p>
+    }
+</div>

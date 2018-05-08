@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TableTop2017CoreWeb.Models
 {
-    public class RoundMatchups
+    public class RoundMatchup
     {
         public int Id { get; set; }
         [DisplayName("Round Number")]
@@ -20,9 +20,9 @@ namespace TableTop2017CoreWeb.Models
         [DisplayName("BattleScore")]
         public int PlayerTwoBattleScore { get; set; }
         [DisplayName("Sportsmanship Grade")]
-        public string PlayerOneSportsmanshipScore { get; set; }
+        public int PlayerOneSportsmanshipScore { get; set; }
         [DisplayName("Sportsmanship Grade")]
-        public string PlayerTwoSportsmanshipScore { get; set; }
+        public int PlayerTwoSportsmanshipScore { get; set; }
         public int Table { get; set; }
     }
 }

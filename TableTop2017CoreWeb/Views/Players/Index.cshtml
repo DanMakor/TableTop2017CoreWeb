@@ -96,7 +96,10 @@
 </div>
 
 <div class="col-md-3 mt-sm">
-    @Html.ActionLink("Generate Round", "GenerateRoundMatchups", "RoundMatchups", null, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Generate Round", "DisplayNextRound", "Admin", null, new { @class = "btn btn-primary" })
+</div>
+<div class="col-md-3 mt-sm">
+    @Html.ActionLink("Generate Pair Round", "DisplayNextPairRound", "Admin", null, new { @class = "btn btn-primary" })
 </div>
 
 @section scripts{

@@ -18,8 +18,9 @@ namespace TableTop2017CoreWeb.Models
         public string EmailAddress { get; set; }
         public string Notes { get; set; }
         public Boolean Paid { get; set; }
-        [DisplayName("BattleScore")]
+        [DisplayName("Battle Score")]
         public int BattleScore { get; set; } 
+        [DisplayName("Sports Score")]
         public int SportsmanshipScore { get; set; }
         public Player CurrentOpponent { get; set; }
 

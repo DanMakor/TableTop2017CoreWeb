@@ -12,9 +12,10 @@ namespace TableTop2017CoreWeb.Data
         public TournamentDbContext(DbContextOptions<TournamentDbContext> options) : base(options) {
 
         }
-
+        public DbSet<Round> Rounds { get; set; }
         public DbSet<Player> Players { get; set; }
-        public DbSet<RoundMatchups> RoundMatchups { get; set; }
+        public DbSet<RoundMatchup> RoundMatchups { get; set; }
+        public DbSet<PairRoundMatchup> PairRoundMatchup { get; set; }
     }
 }
 
