@@ -26,6 +26,31 @@ namespace TableTop2017CoreWeb.Controllers
             return View(players);
         }
 
+
+        public async Task<IActionResult> NoOfTables()
+        {
+            var NoOfTa = new NoOfTablesModel();
+
+            List<Player> players = await _context.Players.OrderByDescending(p => p.BattleScore).ToListAsync();
+            NoOfTa.Players = players;
+
+            return View(NoOfTa);
+
+        }
+        public async Task<IActionResult> NoOfTables([Bind("Id,NoOfTables")] NoOfTablesModel NoOfTables)
+        {
+            
+            if (ModelState.IsValid)
+            {
+                _context.Add(NoOfTables);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("NoOfTables");
+            }
+            return View(NoOfTables);
+
+        }
+
+
         // GET: Players/Details/5
         public async Task<IActionResult> Details(int? id)
         {

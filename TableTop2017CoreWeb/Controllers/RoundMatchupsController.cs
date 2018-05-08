@@ -500,8 +500,7 @@ namespace TableTop2017CoreWeb.Controllers
         }
         public int GetnoOfTables()
         {
-            
-            // var TableNumber = object.getElementById("noOfTables");
+            //NoOfTablesModel NoOfTa= _context.
 
             return 5;
         }

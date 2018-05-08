@@ -15,6 +15,7 @@ namespace TableTop2017CoreWeb.Data
 
         public DbSet<Player> Players { get; set; }
         public DbSet<RoundMatchups> RoundMatchups { get; set; }
+        public DbSet<TableTop2017CoreWeb.Models.RoundsModel> RoundsModel { get; set; }
     }
 }
 

@@ -9,7 +9,9 @@ namespace TableTop2017CoreWeb.Models
     {
         public int Id { get; set; }
         public int RoundNo { get; set; }
-        public List<RoundMatchups> RoundMatchup {get;set;}
+        public int NoTableTops { get; set; }
+        public List<Player> ActivePlayers { get; set; }
+        public List<RoundMatchups> RoundMatchups { get; set; }
 
     }
 }
