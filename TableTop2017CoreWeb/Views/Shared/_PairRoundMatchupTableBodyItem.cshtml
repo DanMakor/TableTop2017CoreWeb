@@ -1,0 +1,60 @@
+﻿@model TableTop2017CoreWeb.Models.PairRoundMatchup
+
+    
+@*PlayerOne and PlayerTwo are the first team
+PlayerThree and PlayerFour are the second team*@
+<tr>
+    <td>
+        @Html.DisplayFor(model => model.RoundNo)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerOne.SportsmanshipScore)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerOne.BattleScore)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerOne.Name)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.Table)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerThree.Name)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerThree.BattleScore)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerThree.SportsmanshipScore)
+    </td>
+    <td>
+        <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+    </td>
+</tr>
+<tr>
+    <td>
+
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerTwo.SportsmanshipScore)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerTwo.BattleScore)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerTwo.Name)
+    </td>
+    <td>
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerFour.Name)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerFour.BattleScore)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerFour.SportsmanshipScore)
+    </td>
+</tr>
+

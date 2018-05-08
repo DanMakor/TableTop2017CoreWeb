@@ -1,0 +1,35 @@
+﻿
+@model TableTop2017CoreWeb.Models.RoundMatchup
+
+<tr>
+    <td>
+        @Html.DisplayFor(model => model.RoundNo)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerOne.SportsmanshipScore)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerOne.BattleScore)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerOne.Name)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.Table)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerTwo.Name)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerTwo.BattleScore)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.PlayerTwo.SportsmanshipScore)
+    </td>
+    <td>
+        <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+    </td>
+</tr>
+        
+
+

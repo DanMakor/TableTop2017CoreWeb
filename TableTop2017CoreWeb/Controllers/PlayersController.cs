@@ -171,8 +171,8 @@ namespace TableTop2017CoreWeb.Controllers
             {
                 playerBattleScores.Add(player, 0);
             }
-            List<RoundMatchups> roundMatchups = _context.RoundMatchups.ToList();
-            foreach (RoundMatchups roundMatchup in roundMatchups)
+            List<RoundMatchup> roundMatchups = _context.RoundMatchups.ToList();
+            foreach (RoundMatchup roundMatchup in roundMatchups)
             {
                 playerBattleScores[roundMatchup.PlayerOne] += roundMatchup.PlayerOneBattleScore;
                 playerBattleScores[roundMatchup.PlayerTwo] += roundMatchup.PlayerTwoBattleScore;

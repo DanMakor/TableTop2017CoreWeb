@@ -6,6 +6,29 @@
     <Authors>Daniel; Stephen</Authors>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Migrations\20180502000006_PlayerTeammate.cs" />
+    <Compile Remove="Migrations\20180502000006_PlayerTeammate.Designer.cs" />
+    <Compile Remove="Migrations\20180502034810_PairRoundMatchup.cs" />
+    <Compile Remove="Migrations\20180502034810_PairRoundMatchup.Designer.cs" />
+    <Compile Remove="Migrations\20180502035502_PairRoundMatchup.cs" />
+    <Compile Remove="Migrations\20180502035502_PairRoundMatchup.Designer.cs" />
+    <Compile Remove="Migrations\20180503120551_Testing.cs" />
+    <Compile Remove="Migrations\20180503120551_Testing.Designer.cs" />
+    <Compile Remove="Migrations\20180503131800_PlayerOpponentTeammateRelationship.cs" />
+    <Compile Remove="Migrations\20180503131800_PlayerOpponentTeammateRelationship.Designer.cs" />
+    <Compile Remove="Migrations\20180503131905_PlayerOpponentTeammateRelationship.cs" />
+    <Compile Remove="Migrations\20180503131905_PlayerOpponentTeammateRelationship.Designer.cs" />
+    <Compile Remove="Migrations\20180503132539_PlayerTeammateOppRelationship.cs" />
+    <Compile Remove="Migrations\20180503132539_PlayerTeammateOppRelationship.Designer.cs" />
+    <Compile Remove="Migrations\20180503132629_PlayerTeammateOppRelationship.cs" />
+    <Compile Remove="Migrations\20180503132629_PlayerTeammateOppRelationship.Designer.cs" />
+    <Compile Remove="Migrations\20180503132654_PlayerTeammateOppRelationship.cs" />
+    <Compile Remove="Migrations\20180503132654_PlayerTeammateOppRelationship.Designer.cs" />
+    <Compile Remove="Migrations\20180503141104_PendingChanges.cs" />
+    <Compile Remove="Migrations\20180503141104_PendingChanges.Designer.cs" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6" />
