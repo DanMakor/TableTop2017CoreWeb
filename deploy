@@ -13,30 +13,23 @@ sudo apt-get install apache2
 #Configute Apache2 to act as a reverse proxy
 sudo a2enmod proxy proxy_http proxy_html
 
-sudo touch /etc/apache2/conf-enabled/TabelTopCoreWeb.conf
-FILE= "/etc/apache2/conf-enabled/TabelTopCoreWeb.conf"
 
-/bin/cat <<EOM >$FILE
-<VirtualHost *:80>
+sudo echo "<VirtualHost *:80>
 ProxyPreserveHost On
 ProxyPass / http://127.0.0.1:63792/
 ProxyPassReverse / http://127.0.0.1:63792/
 ErrorLog /var/log/apache2/TabelTopCoreWeb-error.log
 CustomLog /var/log/apache2/TabelTopCoreWeb-access.log common
-</VirtualHost>
-EOM
+</VirtualHost>" >> /etc/apache2/conf-enabled/TabelTopCoreWeb.conf
 
 #restart apache
 sudo service apache2 restart
 
 #Set apache to manage kestrel server
-sudo touch /etc/systemd/system/kestrel-TableTopCoreWeb.service
 
-FILE="/etc/systemd/system/kestrel-TableTopCoreWeb.service"
 
-/bin/cat <<EOM >$FILE
 
-[Unit]
+sudo echo "[Unit]
 Description=TableTop ASP .NET Web Application running on Ubuntu 16.04
 [Service]
 WorkingDirectory=/home/ubuntu/TableTop2017CoreWeb/TableTop2017CoreWeb/bin/Release
@@ -47,8 +40,7 @@ SyslogIdentifier=tabletop
 User=www-data
 Environment=ASPNETCORE_ENVIRONMENT=Production
 [Install]
-WantedBy=multi-user.target
-EOM
+WantedBy=multi-user.target" >> /etc/systemd/system/kestrel-TableTopCoreWeb.service
 
 #Enable and start service
 sudo systemctl enable kestrel-TableTopCoreWeb.service
