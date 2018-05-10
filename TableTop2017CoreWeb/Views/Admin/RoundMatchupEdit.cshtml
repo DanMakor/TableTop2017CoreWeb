@@ -28,41 +28,48 @@
                     </select>
                     <span asp-validation-for="PlayerOneId" class="text-danger"></span>
                 </div>
-                <div class="form-group">
-                    <label asp-for="PlayerOneBattleScore" class="control-label"></label>
-                    <input asp-for="PlayerOneBattleScore" class="form-control" />
-                    <span asp-validation-for="PlayerOneBattleScore" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="PlayerOneSportsmanshipScore" class="control-label"></label>
-                    <input asp-for="PlayerOneSportsmanshipScore" class="form-control" />
-                    <span asp-validation-for="PlayerOneSportsmanshipScore" class="text-danger"></span>
-                </div>
+                @*If this round is a bye, don't show the battlescore allocation*@
+                @if (Model.PlayerTwoId != 0.5)
+                {
+                    <div class="form-group">
+                        <label asp-for="PlayerOneBattleScore" class="control-label"></label>
+                        <input asp-for="PlayerOneBattleScore" class="form-control" />
+                        <span asp-validation-for="PlayerOneBattleScore" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="PlayerOneSportsmanshipScore" class="control-label"></label>
+                        <input asp-for="PlayerOneSportsmanshipScore" class="form-control" />
+                        <span asp-validation-for="PlayerOneSportsmanshipScore" class="text-danger"></span>
+                    </div>
+                }
             </div>
-            <div class="col-md-1"><h3 class="mt-xs">VS.</h3></div>
+            <div class="col-md-1">@if (Model.PlayerTwoId != 0.5) { <h3 class="mt-xs">VS.</h3> } else { <h3>Bye Matchup</h3> }</div>
             <div class="col-md-4">
-                <div class="form-group">
-                    <label asp-for="PlayerTwoId" class="control-label"></label>
-                    <select asp-for="PlayerTwoId">
-                        @foreach (var item in Model.Players)
-                        {
-                            <option selected="@(item.Id == Model.PlayerTwoId)" value="@item.Id">
-                                @item.Name
-                            </option>
-                        }
-                    </select>
-                    <span asp-validation-for="PlayerTwoId" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="PlayerTwoBattleScore" class="control-label"></label>
-                    <input asp-for="PlayerTwoBattleScore" class="form-control" />
-                    <span asp-validation-for="PlayerTwoBattleScore" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="PlayerTwoSportsmanshipScore" class="control-label"></label>
-                    <input asp-for="PlayerTwoSportsmanshipScore" class="form-control" />
-                    <span asp-validation-for="PlayerTwoSportsmanshipScore" class="text-danger"></span>
-                </div>
+                @if (Model.PlayerTwoId != 0.5)
+                {
+                    <div class="form-group">
+                        <label asp-for="PlayerTwoId" class="control-label"></label>
+                        <select asp-for="PlayerTwoId">
+                            @foreach (var item in Model.Players)
+                            {
+                                <option selected="@(item.Id == Model.PlayerTwoId)" value="@item.Id">
+                                    @item.Name
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="PlayerTwoId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="PlayerTwoBattleScore" class="control-label"></label>
+                        <input asp-for="PlayerTwoBattleScore" class="form-control" />
+                        <span asp-validation-for="PlayerTwoBattleScore" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="PlayerTwoSportsmanshipScore" class="control-label"></label>
+                        <input asp-for="PlayerTwoSportsmanshipScore" class="form-control" />
+                        <span asp-validation-for="PlayerTwoSportsmanshipScore" class="text-danger"></span>
+                    </div>
+                }
             </div>
         </div>
     </div>

@@ -13,6 +13,7 @@ namespace TableTop2017CoreWeb.Models
         public string Name { get; set; }
         public string Army { get; set; }
         public Boolean Active { get; set; } 
+        public Boolean Bye { get; set; }
         [DisplayName("Email Address")]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string EmailAddress { get; set; }
@@ -27,6 +28,7 @@ namespace TableTop2017CoreWeb.Models
         public Player()
         {
             Active = true;
+            Bye = false;
             BattleScore = 0;
             SportsmanshipScore = 0;
         }

@@ -6,25 +6,18 @@
         bye = true;
     }
 }
-    
+
 @*PlayerOne and PlayerTwo are the first team
-PlayerThree and PlayerFour are the second team*@
+    PlayerThree and PlayerFour are the second team*@
 <tr class="@(bye ? "bg-warning" : " ")">
-    <td>
-        @Html.DisplayFor(model => model.RoundNo)
-    </td>
     @if (!bye)
     {
         <td>
-            @Html.DisplayFor(model => model.PlayerOneSportsmanshipScore)
-        </td>
-        <td>
-            @Html.DisplayFor(model => model.PlayerOneBattleScore)
+            @Html.DisplayFor(model => model.PlayerOne.Army)
         </td>
     }
     else
     {
-        <td></td>
         <td></td>
     }
     <td>
@@ -39,13 +32,10 @@ PlayerThree and PlayerFour are the second team*@
     else
     {
         <td></td>
-
     }
-    @*If this is a bye round*@
     @if (bye)
     {
         <td class="text-warning">[_BYE_]</td>
-        <td></td>
         <td></td>
     }
     else
@@ -54,41 +44,25 @@ PlayerThree and PlayerFour are the second team*@
             @Html.DisplayFor(model => model.PlayerThree.Name)
         </td>
         <td>
-            @Html.DisplayFor(model => model.PlayerThreeBattleScore)
-        </td>
-        <td>
-            @Html.DisplayFor(model => model.PlayerThreeSportsmanshipScore)
+            @Html.DisplayFor(model => model.PlayerThree.Army)
         </td>
     }
-    <td>
-        <a asp-action="AllRoundsEdit" asp-route-id="@Model.Id">Edit</a>
-    </td>
 </tr>
 @if (!bye)
 {
     <tr>
         <td>
-
-        </td>
-        <td>
-            @Html.DisplayFor(model => model.PlayerTwoSportsmanshipScore)
-        </td>
-        <td>
-            @Html.DisplayFor(model => model.PlayerTwoBattleScore)
+            @Html.DisplayFor(model => model.PlayerTwo.Army)
         </td>
         <td>
             @Html.DisplayFor(model => model.PlayerTwo.Name)
         </td>
-        <td>
-        </td>
+        <td></td>
         <td>
             @Html.DisplayFor(model => model.PlayerFour.Name)
         </td>
         <td>
-            @Html.DisplayFor(model => model.PlayerFourBattleScore)
-        </td>
-        <td>
-            @Html.DisplayFor(model => model.PlayerFourSportsmanshipScore)
+            @Html.DisplayFor(model => model.PlayerFour.Army)
         </td>
     </tr>
 }

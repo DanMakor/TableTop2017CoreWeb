@@ -41,6 +41,13 @@
                 </div>
             </div>
             <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Bye" /> @Html.DisplayNameFor(model => model.Bye)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
                 <label asp-for="EmailAddress" class="control-label"></label>
                 <input asp-for="EmailAddress" class="form-control" />
                 <span asp-validation-for="EmailAddress" class="text-danger"></span>

@@ -6,13 +6,10 @@
         bye = true;
     }
 }
-    
+
 @*PlayerOne and PlayerTwo are the first team
-PlayerThree and PlayerFour are the second team*@
+    PlayerThree and PlayerFour are the second team*@
 <tr class="@(bye ? "bg-warning" : " ")">
-    <td>
-        @Html.DisplayFor(model => model.RoundNo)
-    </td>
     @if (!bye)
     {
         <td>
@@ -61,15 +58,12 @@ PlayerThree and PlayerFour are the second team*@
         </td>
     }
     <td>
-        <a asp-action="AllRoundsEdit" asp-route-id="@Model.Id">Edit</a>
+        @if (!bye) { <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> }
     </td>
 </tr>
 @if (!bye)
 {
     <tr>
-        <td>
-
-        </td>
         <td>
             @Html.DisplayFor(model => model.PlayerTwoSportsmanshipScore)
         </td>
@@ -79,8 +73,7 @@ PlayerThree and PlayerFour are the second team*@
         <td>
             @Html.DisplayFor(model => model.PlayerTwo.Name)
         </td>
-        <td>
-        </td>
+        <td></td>
         <td>
             @Html.DisplayFor(model => model.PlayerFour.Name)
         </td>

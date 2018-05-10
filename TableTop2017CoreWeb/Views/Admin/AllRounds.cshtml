@@ -52,22 +52,11 @@
 </table>
 
 <div class="mt-xs">
-    @if (ViewData["DuplicatePlayers"] != null)
-    {
-        <p class="text-danger">@ViewData["DuplicatePlayers"]</p>
-    }
-    @if (ViewData["DuplicateOpponents"] != null)
-    {
-        <p class="text-danger">@ViewData["DuplicateOpponents"]</p>
-    }
-    @if (ViewData["OverallocatedPlayers"] != null)
-    {
-        <p class="text-danger">@ViewData["OverallocatedPlayers"]</p>
-    }
-    @if (ViewData["UnallocatedPlayers"] != null)
-    {
-        <p class="text-danger">@ViewData["UnallocatedPlayers"]</p>
-    }
+    <p class="text-success">@ViewData["Status"]</p>
+    <p class="text-danger">@ViewData["DuplicatePlayers"]</p>
+    <p class="text-danger">@ViewData["OverallocatedPlayers"]</p>
+    <p class="text-danger">@ViewData["UnallocatedPlayers"]</p>
+    <p class="text-warning">@ViewData["DuplicateOpponents"]</p>
 </div>
 
 @Html.ActionLink("Validate Matchups", "ValidateAllRoundMatchups", "Admin", null, new { @class = "btn btn-primary mt-xs" })

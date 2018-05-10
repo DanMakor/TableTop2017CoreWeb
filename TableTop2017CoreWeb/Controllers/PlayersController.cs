@@ -23,6 +23,7 @@ namespace TableTop2017CoreWeb.Controllers
         public async Task<IActionResult> Index()
         {
             List<Player> players = await _context.Players.OrderByDescending(p => p.BattleScore).ToListAsync();
+            ViewData["Errors"] = TempData["Errors"];
             return View(players);
         }
 
@@ -88,7 +89,7 @@ namespace TableTop2017CoreWeb.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,BattleScore,SportsmanshipScore,Army,Active,EmailAddress,Notes,Paid")] Player player)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,BattleScore,SportsmanshipScore,Army,Active,Bye,EmailAddress,Notes,Paid")] Player player)
         {
             if (id != player.Id)
             {

@@ -12,9 +12,10 @@ using TableTop2017CoreWeb.Data;
 namespace TableTop2017CoreWeb.Migrations
 {
     [DbContext(typeof(TournamentDbContext))]
-    partial class TournamentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180508121429_PlayerByeProperty")]
+    partial class PlayerByeProperty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,8 +70,6 @@ namespace TableTop2017CoreWeb.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("Bye");
 
                     b.Property<string>("Discriminator")
                         .IsRequired();
