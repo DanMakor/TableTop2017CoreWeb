@@ -27,14 +27,14 @@ namespace TableTop2017CoreWeb
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            var connection = @"Server=(localdb)\mssqllocaldb;Database=EFGetStarted.AspNetCore.NewDb;Trusted_Connection=True;ConnectRetryCount=0";
-            services.AddDbContext<TournamentDbContext>(options => options.UseSqlServer(connection));
+            var connection = "Data Source=tournament.db";
+			services.AddDbContext<TournamentDbContext>(options => options.UseSqlite(connection));
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
