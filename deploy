@@ -53,5 +53,3 @@ cd /home/ubuntu/TableTop2017CoreWeb/TableTop2017CoreWeb
 dotnet restore
 
 dotnet ef database update --context TournamentDbContext
-
-dotnet run
