@@ -23,33 +23,8 @@ namespace TableTop2017CoreWeb.Controllers
         public async Task<IActionResult> Index()
         {
             List<Player> players = await _context.Players.OrderByDescending(p => p.BattleScore).ToListAsync();
-            return View(players);
+            return RedirectToAction("PlayersDisplay", "Rounds", players);
         }
-
-
-        public async Task<IActionResult> NoOfTables()
-        {
-            var NoOfTa = new NoOfTablesModel();
-
-            List<Player> players = await _context.Players.OrderByDescending(p => p.BattleScore).ToListAsync();
-            NoOfTa.Players = players;
-
-            return View(NoOfTa);
-
-        }
-        public async Task<IActionResult> NoOfTables([Bind("Id,NoOfTables")] NoOfTablesModel NoOfTables)
-        {
-            
-            if (ModelState.IsValid)
-            {
-                _context.Add(NoOfTables);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("NoOfTables");
-            }
-            return View(NoOfTables);
-
-        }
-
 
         // GET: Players/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -196,8 +171,8 @@ namespace TableTop2017CoreWeb.Controllers
             {
                 playerBattleScores.Add(player, 0);
             }
-            List<RoundMatchups> roundMatchups = _context.RoundMatchups.ToList();
-            foreach (RoundMatchups roundMatchup in roundMatchups)
+            List<RoundMatchup> roundMatchups = _context.RoundMatchups.ToList();
+            foreach (RoundMatchup roundMatchup in roundMatchups)
             {
                 playerBattleScores[roundMatchup.PlayerOne] += roundMatchup.PlayerOneBattleScore;
                 playerBattleScores[roundMatchup.PlayerTwo] += roundMatchup.PlayerTwoBattleScore;

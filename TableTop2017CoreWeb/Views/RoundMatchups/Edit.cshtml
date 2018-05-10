@@ -1,4 +1,4 @@
-﻿@model TableTop2017CoreWeb.Models.RoundMatchups
+﻿@model TableTop2017CoreWeb.Models.RoundMatchup
 
 @{
     ViewData["Title"] = "Edit";
@@ -21,11 +21,11 @@
                         </th>
                         <th>
                             @Html.DisplayFor(model => model.PlayerOne.Name)
-                            @Html.DisplayNameFor(model => model.PlayerOneBattleScore)
+                            @Html.DisplayNameFor(model => model.PlayerOneSportsmanshipScore)
                         </th>
                         <th>
                             @Html.DisplayFor(model => model.PlayerOne.Name)
-                            @Html.DisplayNameFor(model => model.PlayerOneSportsmanshipScore)
+                            @Html.DisplayNameFor(model => model.PlayerOneBattleScore)
                         </th>
                         <th>
                             @Html.DisplayNameFor(model => model.Table)
@@ -48,19 +48,18 @@
                         </td>
                         <td>
                             <div class="form-group">
-                                <label asp-for="PlayerOneBattleScore" class="control-label"></label>
-                                <input asp-for="PlayerOneBattleScore" class="form-control" />
-                                <span asp-validation-for="PlayerOneBattleScore" class="text-danger"></span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-group">
                                 <label asp-for="PlayerOneSportsmanshipScore" class="control-label"></label>
                                 <input asp-for="PlayerOneSportsmanshipScore" class="form-control" />
                                 <span asp-validation-for="PlayerOneSportsmanshipScore" class="text-danger"></span>
                             </div>
                         </td>
-
+                        <td>
+                            <div class="form-group">
+                                <label asp-for="PlayerOneBattleScore" class="control-label"></label>
+                                <input asp-for="PlayerOneBattleScore" class="form-control" />
+                                <span asp-validation-for="PlayerOneBattleScore" class="text-danger"></span>
+                            </div>
+                        </td>
                         <td>
                             @Html.DisplayFor(model => model.Table)
                         </td>

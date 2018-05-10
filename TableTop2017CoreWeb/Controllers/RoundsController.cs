@@ -8,10 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using TableTop2017CoreWeb.Data;
 using TableTop2017CoreWeb.Models;
 
+
 namespace TableTop2017CoreWeb.Controllers
 {
     public class RoundsController : Controller
     {
+
         private readonly TournamentDbContext _context;
 
         public RoundsController(TournamentDbContext context)
@@ -19,137 +21,130 @@ namespace TableTop2017CoreWeb.Controllers
             _context = context;
         }
 
-        // GET: Rounds
         public async Task<IActionResult> Index()
         {
             return View(await _context.RoundsModel.ToListAsync());
         }
 
-        // GET: Rounds/Details/5
-        public async Task<IActionResult> Details(int? id)
+       /* public async Task<int> GetLastRound(TournamentDbContext _context)
         {
-            if (id == null)
+            int currentRound = 1;
+            Rounds lastRound = await _context.Rounds.LastOrDefaultAsync();
+            if (lastRound != null)
             {
-                return NotFound();
+                currentRound = lastRound.RoundNo;
             }
-
-            var roundsModel = await _context.RoundsModel
-                .SingleOrDefaultAsync(m => m.Id == id);
-            if (roundsModel == null)
-            {
-                return NotFound();
-            }
-
-            return View(roundsModel);
+            return currentRound;
         }
-
-        // GET: Rounds/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Rounds/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,RoundNo,NoTableTops")] RoundsModel roundsModel)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(roundsModel);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(roundsModel);
-        }
-
-        // GET: Rounds/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var roundsModel = await _context.RoundsModel.SingleOrDefaultAsync(m => m.Id == id);
-            if (roundsModel == null)
-            {
-                return NotFound();
-            }
-            return View(roundsModel);
-        }
-
-        // POST: Rounds/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,RoundNo,NoTableTops")] RoundsModel roundsModel)
-        {
-            if (id != roundsModel.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(roundsModel);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!RoundsModelExists(roundsModel.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(roundsModel);
-        }
-
-        // GET: Rounds/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var roundsModel = await _context.RoundsModel
-                .SingleOrDefaultAsync(m => m.Id == id);
-            if (roundsModel == null)
-            {
-                return NotFound();
-            }
-
-            return View(roundsModel);
-        }
-
-        // POST: Rounds/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var roundsModel = await _context.RoundsModel.SingleOrDefaultAsync(m => m.Id == id);
-            _context.RoundsModel.Remove(roundsModel);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
+        */
         private bool RoundsModelExists(int id)
         {
             return _context.RoundsModel.Any(e => e.Id == id);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GoToAction(string submitButton, [Bind("Id,RoundNo,NoTableTops,Players,RoundMatchups")] RoundsModel Round)
+        {
+            switch (submitButton)
+            {
+                case "GoToDisplayNextRound":
+                    // delegate sending to another controller action
+                    if (ModelState.IsValid)
+                    {
+                        _context.Add(Round);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction("DisplayNextRound", "Admin");
+                    }
+                    break;
+                case "GoToDisplayNextPairRound":
+                    // call another action to perform the cancellation
+                    if (ModelState.IsValid)
+                    {
+                        _context.Add(Round);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction("DisplayNextPairRound", "Admin");
+                    }
+                    break;
+                default:
+                    // If they've submitted the form without a submitButton, 
+                    // just return the view again.
+                    return (View(Round));
+            }
+            return (View(Round));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GoToDisplayNextRound([Bind("Id,RoundNo,NoTableTops,Players,RoundMatchups")] RoundsModel Round)
+        {
+            if (_context.RoundsModel.Count() == 0)
+            {
+               // Round.RoundNo = 1;
+            }
+            else
+            {
+               // Round.RoundNo = _context.RoundsModel.Last().RoundNo + 1;
+            }
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(Round);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("DisplayNextRound", "Admin");
+            }
+
+            return View(Round);
+        }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GoToDisplayNextPairRound([Bind("Id,NoTableTops,NoTableTops,Players,RoundMatchups")] RoundsModel Round)
+        {
+            if (_context.RoundsModel.Count() == 0)
+            {
+               // Round.RoundNo = 1;
+            }
+            else
+            {
+                //Round.RoundNo = _context.RoundsModel.Last().RoundNo + 1;
+            }
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(Round);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("DisplayNextPairRound", "Admin");
+            }
+
+            return View(Round);
+        }
+
+     
+        public async Task<IActionResult> PlayersDisplay()
+        {
+
+            var display = new RoundsModel();
+
+            List<Player> players = await _context.Players.OrderByDescending(p => p.BattleScore).ToListAsync();
+            if (_context.RoundsModel.Count() > 0)
+                display.NoTableTops = _context.RoundsModel.Last().NoTableTops;
+            display.Players = players;
+            return View(display);
+        }
+
+
+
+        //gets all players from players model
+        public List<Player> GetPlayers()
+        {
+            List<Player> players = _context.Players.OrderByDescending(p => p.BattleScore).ToList();
+            return players;
+
+        }
+        //Gets all active players from Players Model
         public List<Player> GetActivePlayers()
         {
             List<Player> players = _context.Players.OrderByDescending(p => p.BattleScore).ToList();
@@ -165,13 +160,13 @@ namespace TableTop2017CoreWeb.Controllers
 
         }
 
-        public List<RoundMatchups> GetRoundMatchups()
+        public List<RoundMatchup> GetRoundMatchups()
         {
-            List<RoundMatchups> roundMatchups = _context.RoundMatchups.ToList();
+            List<RoundMatchup> roundMatchups = _context.RoundMatchups.ToList();
             var currentRound = 0;
             if (_context.RoundsModel.Last().RoundNo > 0)
                 currentRound = _context.RoundsModel.Last().RoundNo++;
-           // currentRpund = _context.RoundsModel.RoundNo.Last();
+            // currentRpund = _context.RoundsModel.RoundNo.Last();
             foreach (var matchup in roundMatchups)
             {
                 if (matchup.RoundNo != currentRound)
@@ -182,6 +177,7 @@ namespace TableTop2017CoreWeb.Controllers
             return roundMatchups;
 
         }
+
 
 
     }

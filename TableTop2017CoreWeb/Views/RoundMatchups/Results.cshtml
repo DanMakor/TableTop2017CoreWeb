@@ -1,11 +1,8 @@
-﻿@model IEnumerable<TableTop2017CoreWeb.Models.RoundMatchups>
-
+﻿@model IEnumerable<TableTop2017CoreWeb.Models.RoundMatchup>
 @{
     ViewData["Title"] = "Results";
 }
-
 <h2>Results</h2>
-
 <table class="table">
     <thead>
         <tr>
@@ -72,7 +69,10 @@
     </tbody>
 </table>
 
-@Html.ActionLink("Back To Players", "UpdateBattleScores", "RoundMatchups", null, new { @class = "btn btn-primary" })
 <div class="col-md-3 mt-sm">
-    @Html.ActionLink("Generate Next Round", "UpdateBattleScoresContinue", "RoundMatchups", new { page = "Admin" }, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Generate Next Round", "UpdateBattleScoresContinue", "RoundMatchups", null, new { @class = "btn btn-primary" })
+</div>
+
+<div class="col-md-3 mt-sm">
+    @Html.ActionLink("Back To Players", "UpdateBattleScores", "RoundMatchups", null, new { @class = "btn btn-primary" })
 </div>

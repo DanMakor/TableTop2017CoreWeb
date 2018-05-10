@@ -12,9 +12,10 @@ using TableTop2017CoreWeb.Data;
 namespace TableTop2017CoreWeb.Migrations
 {
     [DbContext(typeof(TournamentDbContext))]
-    partial class TournamentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180505003040_RemoveCurrentTeammate")]
+    partial class RemoveCurrentTeammate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,13 +76,13 @@ namespace TableTop2017CoreWeb.Migrations
 
                     b.Property<int?>("PlayerOneId");
 
-                    b.Property<int>("PlayerOneSportsmanshipScore");
+                    b.Property<string>("PlayerOneSportsmanshipScore");
 
                     b.Property<int>("PlayerTwoBattleScore");
 
                     b.Property<int?>("PlayerTwoId");
 
-                    b.Property<int>("PlayerTwoSportsmanshipScore");
+                    b.Property<string>("PlayerTwoSportsmanshipScore");
 
                     b.Property<int?>("RoundId");
 
@@ -106,17 +107,9 @@ namespace TableTop2017CoreWeb.Migrations
                 {
                     b.HasBaseType("TableTop2017CoreWeb.Models.RoundMatchup");
 
-                    b.Property<int>("PlayerFourBattleScore");
-
                     b.Property<int?>("PlayerFourId");
 
-                    b.Property<int>("PlayerFourSportsmanshipScore");
-
-                    b.Property<int>("PlayerThreeBattleScore");
-
                     b.Property<int?>("PlayerThreeId");
-
-                    b.Property<int>("PlayerThreeSportsmanshipScore");
 
                     b.HasIndex("PlayerFourId");
 
