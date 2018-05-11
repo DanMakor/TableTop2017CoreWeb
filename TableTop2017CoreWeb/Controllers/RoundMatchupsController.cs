@@ -36,7 +36,9 @@ namespace TableTop2017CoreWeb.Controllers
             _context.SaveChanges();
             foreach (Player player in _context.Players.ToList())
             {
-                _context.Remove(player);
+                player.BattleScore = 0;
+                player.SportsmanshipScore = 0;
+                player.ArmyScore = 0;
                 _context.SaveChanges();
             }
             //PlayerActions.SetAllPlayerScores(_context);

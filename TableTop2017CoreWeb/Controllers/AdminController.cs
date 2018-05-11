@@ -116,7 +116,11 @@ namespace TableTop2017CoreWeb.Controllers
              || roundMatchup.PlayerThreeId == roundMatchup.PlayerFourId)
             {
                 TempData["Errors"] = "A player cannot verse themself or be on a team with themself";
-                return View(roundMatchup);
+                var adminEditViewModel1 = new AdminEditViewModel() {
+                    RoundMatchup = roundMatchup,
+                    Players = _context.Players.ToList()
+                };
+                return View(adminEditViewModel1);
             }
             PairRoundMatchup updatedPairRoundMatchup = null;
             RoundMatchup updatedRoundMatchup = null;
@@ -164,7 +168,12 @@ namespace TableTop2017CoreWeb.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(roundMatchup);
+            var adminEditViewModel = new AdminEditViewModel()
+            {
+                RoundMatchup = roundMatchup,
+                Players = _context.Players.ToList()
+            };
+            return View(adminEditViewModel);
         }
 
         public ActionResult ValidateRoundMatchups()
