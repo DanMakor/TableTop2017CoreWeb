@@ -21,9 +21,11 @@ namespace TableTop2017CoreWeb.Controllers
         // GET: RoundMatchups Results
         public ActionResult Index()
         {
-            int lastRound = RoundMatchupActions.GetLastRoundNo(_context);
-            List<RoundMatchup> roundMatchups = _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).ToList().Where(r => r.RoundNo == lastRound).OrderByDescending(r => r.PlayerOne.BattleScore).ToList();
-            return View(roundMatchups);
+            int lastRoundNo = RoundMatchupActions.GetLastRoundNo(_context);
+            var roundMatchups = _context.RoundMatchups.Where(r => !(r is PairRoundMatchup)).Where(r => r.RoundNo == lastRoundNo).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).ToList();
+            var pairRoundMatchups = _context.PairRoundMatchups.Where(r => r.RoundNo == lastRoundNo).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Include(r => r.PlayerThree).Include(r => r.PlayerFour).ToList();
+
+            return View(roundMatchups.Union(pairRoundMatchups));
         }
 
         //GET: RoundMatchupEdit
@@ -34,11 +36,18 @@ namespace TableTop2017CoreWeb.Controllers
                 return NotFound();
             }
 
-            var roundMatchup =  _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).ToList().SingleOrDefault(m => m.Id == id);
-            if (roundMatchup is PairRoundMatchup)
-                return View("PairRoundMatchupEdit", roundMatchup);
-            else
-                return View("RoundMatchupEdit", roundMatchup);
+            var roundMatchup =  _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).SingleOrDefault(m => m.Id == id);
+            var pairRoundMatchup = _context.PairRoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Include(r => r.PlayerThree).Include(r => r.PlayerFour).SingleOrDefault(m => m.Id == id);
+            if (pairRoundMatchup != null)
+            {
+                var prmevm = (roundMatchup as PairRoundMatchup).ToPairRoundMatchupEditViewModel();
+                return View("PairRoundMatchupEdit", prmevm);
+            }
+            else 
+            {
+                var arevm = roundMatchup.ToRoundMatchupEditViewModel();
+                return View("RoundMatchupEdit", arevm);
+            }
         }
 
 
@@ -46,16 +55,27 @@ namespace TableTop2017CoreWeb.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RoundMatchupEdit(int id, [Bind("Id,RoundNo,PlayerOneId,PlayerTwoId,PlayerOneBattleScore,PlayerTwoBattleScore,PlayerOneSportsmanshipScore,PlayerTwoSportsmanshipScore,Table")] RoundMatchup roundMatchup)
+        public async Task<IActionResult> RoundMatchupEdit(int id, [Bind("Id, RoundNo, PlayerOneId, PlayerTwoId, PlayerOneBattleScore, PlayerTwoBattleScore, PlayerOneSportsmanshipScore, PlayerTwoSportsmanshipScore, Table")] RoundMatchupEditViewModel roundMatchupvm)
         {
-            if (id != roundMatchup.Id)
+            if (id != roundMatchupvm.Id)
             {
                 return NotFound();
             }
 
-            var oldRoundMatchup = _context.RoundMatchups.SingleOrDefault(r => r.Id == roundMatchup.Id);
-            roundMatchup.PlayerOne = oldRoundMatchup.PlayerOne;
-            roundMatchup.PlayerTwo = oldRoundMatchup.PlayerTwo;
+            var playerOne = await _context.Players.SingleOrDefaultAsync(p => p.Id == roundMatchupvm.PlayerOneId);
+            var playerTwo = await _context.Players.SingleOrDefaultAsync(p => p.Id == roundMatchupvm.PlayerTwoId);
+            var roundMatchup = new RoundMatchup()
+            {
+                Id = roundMatchupvm.Id,
+                RoundNo = roundMatchupvm.RoundNo,
+                PlayerOne = playerOne,
+                PlayerOneBattleScore = roundMatchupvm.PlayerOneBattleScore,
+                PlayerOneSportsmanshipScore = roundMatchupvm.PlayerOneSportsmanshipScore,
+                PlayerTwo = playerTwo,
+                PlayerTwoBattleScore = roundMatchupvm.PlayerTwoBattleScore,
+                PlayerTwoSportsmanshipScore = roundMatchupvm.PlayerTwoSportsmanshipScore,
+                Table = roundMatchupvm.Table
+            };
 
             if (ModelState.IsValid)
             {
@@ -63,8 +83,8 @@ namespace TableTop2017CoreWeb.Controllers
                 {
                     _context.Update(roundMatchup);
                     await _context.SaveChangesAsync();
-                    PlayerActions.SetPlayerScores(roundMatchup.PlayerOne.Id, _context);
-                    PlayerActions.SetPlayerScores(roundMatchup.PlayerTwo.Id, _context);
+                    PlayerActions.SetPlayerScores((int)roundMatchupvm.PlayerOneId, _context);
+                    PlayerActions.SetPlayerScores((int)roundMatchupvm.PlayerTwoId, _context);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -84,34 +104,50 @@ namespace TableTop2017CoreWeb.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PairRoundMatchupEdit(int id, [Bind("Id,RoundNo,PlayerOneBattleScore,PlayerTwoBattleScore,PlayerThreeBattleScore,PlayerFourBattleScore,PlayerOneSportsmanshipScore,PlayerTwoSportsmanshipScore,PlayerThreeSportsmanshipScore,PlayerFourSportsmanshipScore,Table")] PairRoundMatchup pairRoundMatchup)
+        public async Task<IActionResult> PairRoundMatchupEdit(int id, [Bind("Id,RoundNo,PlayerOneId,PlayerTwoId,PlayerThreeId,PlayerFourId,PlayerOneBattleScore,PlayerTwoBattleScore,PlayerThreeBattleScore,PlayerFourBattleScore,PlayerOneSportsmanshipScore,PlayerTwoSportsmanshipScore,PlayerThreeSportsmanshipScore,PlayerFourSportsmanshipScore,Table")] PairRoundMatchupEditViewModel pairRoundMatchupvm)
         {
-            if (id != pairRoundMatchup.Id)
+            if (id != pairRoundMatchupvm.Id)
             {
                 return NotFound();
             }
 
-            var oldPairRoundMatchup = _context.RoundMatchups.AsNoTracking().Include(r => r.PlayerOne).Include(r => r.PlayerTwo).ToList().SingleOrDefault(r => r.Id == pairRoundMatchup.Id) as PairRoundMatchup;
-            pairRoundMatchup.PlayerOne = oldPairRoundMatchup.PlayerOne;
-            pairRoundMatchup.PlayerTwo = oldPairRoundMatchup.PlayerTwo;
-            pairRoundMatchup.PlayerThree = oldPairRoundMatchup.PlayerThree;
-            pairRoundMatchup.PlayerThree = oldPairRoundMatchup.PlayerFour;
-            //Test with the actual playerthree and four objects there
-            //Test with the actual playerthree and four objects there
+            var playerOne = await _context.Players.SingleOrDefaultAsync(p => p.Id == pairRoundMatchupvm.PlayerOneId);
+            var playerTwo = await _context.Players.SingleOrDefaultAsync(p => p.Id == pairRoundMatchupvm.PlayerTwoId);
+            var playerThree = await _context.Players.SingleOrDefaultAsync(p => p.Id == pairRoundMatchupvm.PlayerThreeId);
+            var playerFour = await _context.Players.SingleOrDefaultAsync(p => p.Id == pairRoundMatchupvm.PlayerFourId);
+            var roundMatchup = new PairRoundMatchup()
+            {
+                Id = pairRoundMatchupvm.Id,
+                RoundNo = pairRoundMatchupvm.RoundNo,
+                PlayerOne = playerOne,
+                PlayerOneBattleScore = pairRoundMatchupvm.PlayerOneBattleScore,
+                PlayerOneSportsmanshipScore = pairRoundMatchupvm.PlayerOneSportsmanshipScore,
+                PlayerTwo = playerTwo,
+                PlayerTwoBattleScore = pairRoundMatchupvm.PlayerTwoBattleScore,
+                PlayerTwoSportsmanshipScore = pairRoundMatchupvm.PlayerTwoSportsmanshipScore,
+                PlayerThree = playerThree,
+                PlayerThreeBattleScore = pairRoundMatchupvm.PlayerThreeBattleScore,
+                PlayerThreeSportsmanshipScore = pairRoundMatchupvm.PlayerThreeSportsmanshipScore,
+                PlayerFour = playerFour,
+                PlayerFourBattleScore = pairRoundMatchupvm.PlayerFourBattleScore,
+                PlayerFourSportsmanshipScore = pairRoundMatchupvm.PlayerFourSportsmanshipScore,
+                Table = pairRoundMatchupvm.Table
+            };
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(pairRoundMatchup);
+                    _context.Update(roundMatchup);
                     await _context.SaveChangesAsync();
-                    PlayerActions.SetPlayerScores(pairRoundMatchup.PlayerOne.Id, _context);
-                    PlayerActions.SetPlayerScores(pairRoundMatchup.PlayerTwo.Id, _context);
-                    PlayerActions.SetPlayerScores(pairRoundMatchup.PlayerThree.Id, _context);
-                    PlayerActions.SetPlayerScores(pairRoundMatchup.PlayerFour.Id, _context);
+                    if (playerOne != null) PlayerActions.SetPlayerScores((int)pairRoundMatchupvm.PlayerOneId, _context);
+                    if (playerTwo != null) PlayerActions.SetPlayerScores((int)pairRoundMatchupvm.PlayerTwoId, _context);
+                    if (playerThree != null) PlayerActions.SetPlayerScores((int)pairRoundMatchupvm.PlayerThreeId, _context);
+                    if (playerFour != null) PlayerActions.SetPlayerScores((int)pairRoundMatchupvm.PlayerFourId, _context);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!RoundMatchupActions.RoundMatchupsExists(pairRoundMatchup.Id, _context))
+                    if (!RoundMatchupActions.RoundMatchupsExists(roundMatchup.Id, _context))
                     {
                         return NotFound();
                     }
@@ -122,7 +158,7 @@ namespace TableTop2017CoreWeb.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(pairRoundMatchup);
+            return View(roundMatchup);
         }
 
         //Confirm the score inputs and redirect to the player page index

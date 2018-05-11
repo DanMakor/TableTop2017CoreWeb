@@ -24,5 +24,32 @@ namespace TableTop2017CoreWeb.Models
         [DisplayName("Sportsmanship Grade")]
         public int PlayerTwoSportsmanshipScore { get; set; }
         public int Table { get; set; }
+
+        public RoundMatchupEditViewModel ToRoundMatchupEditViewModel()
+        {
+            var arevm = new RoundMatchupEditViewModel()
+            {
+                Id = this.Id,
+                RoundNo = this.RoundNo,
+                PlayerOneName = this.PlayerOne.Name,
+                PlayerOneId = this.PlayerOne.Id,
+                PlayerOneBattleScore = this.PlayerOneBattleScore,
+                PlayerOneSportsmanshipScore = this.PlayerOneSportsmanshipScore,
+                Table = this.Table,
+            };
+            if (this.PlayerTwo != null)
+            {
+                arevm.PlayerTwoName = this.PlayerTwo.Name;
+                arevm.PlayerTwoId = this.PlayerTwo.Id;
+                arevm.PlayerTwoBattleScore = this.PlayerTwoBattleScore;
+                arevm.PlayerTwoSportsmanshipScore = this.PlayerTwoSportsmanshipScore;
+            }
+            else
+            {
+                arevm.PlayerTwoId = 0.5;
+            }
+            return arevm;
+        }
     }
+
 }

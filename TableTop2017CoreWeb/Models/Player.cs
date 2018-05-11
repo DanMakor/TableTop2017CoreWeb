@@ -23,6 +23,10 @@ namespace TableTop2017CoreWeb.Models
         public int BattleScore { get; set; } 
         [DisplayName("Sports Score")]
         public int SportsmanshipScore { get; set; }
+        [DisplayName("Army Score")]
+        public int ArmyScore { get; set; }
+        [DisplayName("Weighted Score")]
+        public int WeightedScore { get; set; }
         public Player CurrentOpponent { get; set; }
 
         public Player()

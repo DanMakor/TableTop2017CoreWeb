@@ -11,6 +11,10 @@ namespace TableTop2017CoreWeb.Models
         public int Id { get; set; }
         [DisplayName("Round Number")]
         public int RoundNo { get; set; }
+        public string PlayerOneName { get; set; }
+        public string PlayerTwoName { get; set; }
+        public string PlayerThreeName { get; set; }
+        public string PlayerFourName { get; set; }
         [DisplayName("Player One")]
         public double PlayerOneId { get; set; }
         [DisplayName("Player Two")]

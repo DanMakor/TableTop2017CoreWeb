@@ -68,6 +68,7 @@
                     <span asp-validation-for="RoundMatchup.PlayerFourId" class="text-danger"></span>
                 </div>
             }
+            <p class="text-danger">@TempData["Errors"]</p>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-default" />
             </div>

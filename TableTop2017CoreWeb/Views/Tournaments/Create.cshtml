@@ -1,0 +1,41 @@
+﻿@model TableTop2017CoreWeb.Models.Tournament
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<h4>Tournament</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="BattleScoreRatio" class="control-label"></label>
+                <input asp-for="BattleScoreRatio" class="form-control" />
+                <span asp-validation-for="BattleScoreRatio" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SportsmanshipScoreRatio" class="control-label"></label>
+                <input asp-for="SportsmanshipScoreRatio" class="form-control" />
+                <span asp-validation-for="SportsmanshipScoreRatio" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ArmyScoreRatio" class="control-label"></label>
+                <input asp-for="ArmyScoreRatio" class="form-control" />
+                <span asp-validation-for="ArmyScoreRatio" class="text-danger"></span>
+            </div>
+            <p class="text-warning">@TempData["Errors"]</p>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

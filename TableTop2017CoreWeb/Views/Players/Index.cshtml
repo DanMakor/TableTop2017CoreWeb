@@ -19,8 +19,13 @@
     </div>
 
     <div class="col-md-3">
-         <h4 class="text-primary">Click to Add new Players</h4>
-         @Html.ActionLink("Add Player", "Create", "Players", null,new { @class = "btn btn-primary" })
+        <h4 class="text-primary">Click to Add new Players</h4>
+        @Html.ActionLink("Add Player", "Create", "Players", null, new { @class = "btn btn-primary" })
+    </div>
+
+    <div class="col-md-4">
+        <h4 class="text-primary">Click to Update Tournament weighting</h4>
+        @Html.ActionLink("Update Weighting", "Edit/1", "Tournaments", null, new { @class = "btn btn-primary" })
     </div>
 
 </div>
@@ -38,6 +43,12 @@
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.SportsmanshipScore)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ArmyScore)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.WeightedScore)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Army)
@@ -72,6 +83,12 @@
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.SportsmanshipScore)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ArmyScore)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WeightedScore)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Army)

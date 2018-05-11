@@ -34,6 +34,11 @@ namespace TableTop2017CoreWeb.Controllers
                 _context.Remove(roundmatchup);
             }
             _context.SaveChanges();
+            foreach (Player player in _context.Players.ToList())
+            {
+                _context.Remove(player);
+                _context.SaveChanges();
+            }
             //PlayerActions.SetAllPlayerScores(_context);
         }
 
@@ -70,10 +75,11 @@ namespace TableTop2017CoreWeb.Controllers
         // GET: RoundMatchups
         public async Task<IActionResult> Index()
         {
-            int lastRound = RoundMatchupActions.GetLastRoundNo(_context);
+            int lastRoundNo = RoundMatchupActions.GetLastRoundNo(_context);
             //Get all rounds as list from database and then filter using the where clause (potentially inefficient but no time to sort out lazy loading issue)
-            List<RoundMatchup> roundMatchups = _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).ToList().Where(r => r.RoundNo == lastRound).OrderByDescending(r => r.PlayerOne.BattleScore).ToList();
-            return View(roundMatchups);
+            var roundMatchups = _context.RoundMatchups.Where(r => !(r is PairRoundMatchup)).Where(r => r.RoundNo == lastRoundNo).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).ToList();
+            var pairRoundMatchups = _context.PairRoundMatchups.Where(r => r.RoundNo == lastRoundNo).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Include(r => r.PlayerThree).Include(r => r.PlayerFour).ToList();
+            return View(roundMatchups.Union(pairRoundMatchups));
         }
 
         //Generate the RoundMatchups 

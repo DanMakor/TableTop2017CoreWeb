@@ -12,9 +12,10 @@ using TableTop2017CoreWeb.Data;
 namespace TableTop2017CoreWeb.Migrations
 {
     [DbContext(typeof(TournamentDbContext))]
-    partial class TournamentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180511020224_PlayerCalculatedScore")]
+    partial class PlayerCalculatedScore
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,6 +37,8 @@ namespace TableTop2017CoreWeb.Migrations
 
                     b.Property<bool>("Bye");
 
+                    b.Property<int>("CalculatedScore");
+
                     b.Property<int?>("CurrentOpponentId");
 
                     b.Property<string>("EmailAddress");
@@ -47,8 +50,6 @@ namespace TableTop2017CoreWeb.Migrations
                     b.Property<bool>("Paid");
 
                     b.Property<int>("SportsmanshipScore");
-
-                    b.Property<int>("WeightedScore");
 
                     b.HasKey("Id");
 

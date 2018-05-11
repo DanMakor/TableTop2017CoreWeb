@@ -102,10 +102,16 @@ namespace TableTop2017CoreWeb.Helpers
             int playerBattleScore = 0;
             int playerSportsmanshipScore = 0;
 
-            List<RoundMatchup> roundMatchups = _context.RoundMatchups
-                .Where(r => r.PlayerOne.Id == id || r.PlayerTwo.Id == id || (r as PairRoundMatchup).PlayerThree.Id == id || (r as PairRoundMatchup).PlayerFour.Id == id)
-                .Where(r => r.PlayerTwo != null).ToList();
-            
+            var roundMatchups = _context.RoundMatchups
+                .Include(r => r.PlayerOne).Include(r => r.PlayerTwo)
+                .Where(r => !(r is PairRoundMatchup) && r.PlayerTwo != null && r.PlayerOne.Id == id || r.PlayerTwo.Id == id)
+                .ToList();
+            var pairRoundMatchups = _context.PairRoundMatchups
+                .Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Include(r => r.PlayerThree).Include(r => r.PlayerFour)
+                .Where(r => r.PlayerTwo != null && r.PlayerOne.Id == id || r.PlayerTwo.Id == id || r.PlayerThree.Id == id || r.PlayerFour.Id == id)
+                .ToList();
+            roundMatchups = roundMatchups.Union(pairRoundMatchups).ToList();
+
             foreach (RoundMatchup roundMatchup in roundMatchups)
             {
                 if (roundMatchup.PlayerOne.Id == id) { playerBattleScore += roundMatchup.PlayerOneBattleScore; }

@@ -26,12 +26,13 @@ namespace TableTop2017CoreWeb.Controllers
             int lastRoundNo = RoundMatchupActions.GetLastRoundNo(_context);
 
             ViewData["Errors"] = TempData["Errors"];
-            ViewData["DuplicatePlayers"] = TempData["DuplicatePlayers"];
             ViewData["DuplicateOpponents"] = TempData["DuplicateOpponents"];
             ViewData["OverallocatedPlayers"] = TempData["OverallocatedPlayers"];
             ViewData["UnallocatedPlayers"] = TempData["UnallocatedPlayers"];
 
-            return View(_context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).ToList().Where(r => r.RoundNo == lastRoundNo).ToList());
+            var roundMatchups = _context.RoundMatchups.Where(r => !(r is PairRoundMatchup)).Where(r => r.RoundNo == lastRoundNo).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).ToList();
+            var pairRoundMatchups = _context.PairRoundMatchups.Where(r => r.RoundNo == lastRoundNo).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Include(r => r.PlayerThree).Include(r => r.PlayerFour).ToList();
+            return View(roundMatchups.Union(pairRoundMatchups));
 
         }
 
@@ -46,7 +47,7 @@ namespace TableTop2017CoreWeb.Controllers
             }
 
             var roundMatchup = await _context.RoundMatchups.Where(r => r.Id == id).Where(r => !(r is PairRoundMatchup)).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).SingleOrDefaultAsync();
-            var pairRoundMatchup = await _context.PairRoundMatchup.Where(r => r.Id == id).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Include(r => r.PlayerThree).Include(r => r.PlayerFour).SingleOrDefaultAsync();
+            var pairRoundMatchup = await _context.PairRoundMatchups.Where(r => r.Id == id).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Include(r => r.PlayerThree).Include(r => r.PlayerFour).SingleOrDefaultAsync();
             if (roundMatchup != null)
             {
                 aevm.RoundMatchup = new AdminEditRoundMatchupsViewModel
@@ -74,8 +75,7 @@ namespace TableTop2017CoreWeb.Controllers
                 };
                 //Handling bye roundmatchup
                 //If this roundmatchup is not a bye, set PlayerTwoId, PlayerFourId in the view model to the value of PlayerTwo.Id in the roundMatchup
-
-                if (pairRoundMatchup.PlayerTwo != null || pairRoundMatchup.PlayerFour != null)
+                if (pairRoundMatchup.PlayerTwo != null)
                 {
                     aevm.RoundMatchup.PlayerTwoId = pairRoundMatchup.PlayerTwo.Id;
                     aevm.RoundMatchup.PlayerThreeId = pairRoundMatchup.PlayerThree.Id;
@@ -106,18 +106,30 @@ namespace TableTop2017CoreWeb.Controllers
             {
                 return NotFound();
             }
+
+            //Check if a player is versing themself or on a team with themself
+            if (roundMatchup.PlayerOneId == roundMatchup.PlayerTwoId 
+             || roundMatchup.PlayerOneId == roundMatchup.PlayerThreeId 
+             || roundMatchup.PlayerOneId == roundMatchup.PlayerFourId
+             || roundMatchup.PlayerTwoId == roundMatchup.PlayerThreeId
+             || roundMatchup.PlayerTwoId == roundMatchup.PlayerFourId
+             || roundMatchup.PlayerThreeId == roundMatchup.PlayerFourId)
+            {
+                TempData["Errors"] = "A player cannot verse themself or be on a team with themself";
+                return View(roundMatchup);
+            }
             PairRoundMatchup updatedPairRoundMatchup = null;
             RoundMatchup updatedRoundMatchup = null;
             if (_context.RoundMatchups.Find(id) is PairRoundMatchup)
             {
-                updatedPairRoundMatchup = _context.RoundMatchups.Find(id) as PairRoundMatchup;
+                updatedPairRoundMatchup = _context.RoundMatchups.Include(p => p.PlayerOne).Include(p => p.PlayerTwo).SingleOrDefault(r => r.Id == id) as PairRoundMatchup;
                 updatedPairRoundMatchup.PlayerOne = _context.Players.FirstOrDefault(p => p.Id == roundMatchup.PlayerOneId);
                 updatedPairRoundMatchup.PlayerTwo = _context.Players.FirstOrDefault(p => p.Id == roundMatchup.PlayerTwoId);
                 updatedPairRoundMatchup.PlayerThree = _context.Players.FirstOrDefault(p => p.Id == roundMatchup.PlayerThreeId);
                 updatedPairRoundMatchup.PlayerFour = _context.Players.FirstOrDefault(p => p.Id == roundMatchup.PlayerFourId);
             } else
             {
-                updatedRoundMatchup = _context.RoundMatchups.Find(id);
+                updatedRoundMatchup = _context.RoundMatchups.Include(p => p.PlayerOne).Include(p => p.PlayerTwo).SingleOrDefault(r => r.Id == id);
                 updatedRoundMatchup.PlayerOne = _context.Players.FirstOrDefault(p => p.Id == roundMatchup.PlayerOneId);
                 updatedRoundMatchup.PlayerTwo = _context.Players.FirstOrDefault(p => p.Id == roundMatchup.PlayerTwoId);
             }
@@ -162,7 +174,6 @@ namespace TableTop2017CoreWeb.Controllers
             {
                 TempData["Status"] = "You're good to go!";
             }
-            TempData["DuplicatePlayers"] = string.Join(" | ", errors[0]);
             TempData["DuplicateOpponents"] = string.Join(" | ", errors[1]);
             TempData["OverallocatedPlayers"] = string.Join(" | ", errors[2]);
             TempData["UnallocatedPlayers"] = string.Join(" | ", errors[3]);
@@ -201,11 +212,14 @@ namespace TableTop2017CoreWeb.Controllers
         public ActionResult AllRounds()
         {
             ViewData["Status"] = TempData["Status"];
-            ViewData["DuplicatePlayers"] = TempData["DuplicatePlayers"];
             ViewData["DuplicateOpponents"] = TempData["DuplicateOpponents"];
             ViewData["OverallocatedPlayers"] = TempData["OverallocatedPlayers"];
             ViewData["UnallocatedPlayers"] = TempData["UnallocatedPlayers"];
-            return View(_context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).ToList());
+
+            var roundMatchups = _context.RoundMatchups.Where(r => !(r is PairRoundMatchup)).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).ToList();
+            var pairRoundMatchups = _context.PairRoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Include(r => r.PlayerThree).Include(r => r.PlayerFour).ToList();
+
+            return View(roundMatchups.Union(pairRoundMatchups));
         }
 
         //GET: AllRoundsEdit (Edit one round)
@@ -221,58 +235,14 @@ namespace TableTop2017CoreWeb.Controllers
             if (roundMatchup is PairRoundMatchup)
             {
                 var pairRoundMatchup = roundMatchup as PairRoundMatchup;
-                var prmevm = new PairRoundMatchupEditViewModel()
-                {
-                    Id = pairRoundMatchup.Id,
-                    RoundNo = pairRoundMatchup.RoundNo,
-                    PlayerOneId = pairRoundMatchup.PlayerOne.Id,
-                    PlayerOneBattleScore = pairRoundMatchup.PlayerOneBattleScore,
-                    PlayerOneSportsmanshipScore = pairRoundMatchup.PlayerOneSportsmanshipScore,
-                    Table = pairRoundMatchup.Table,
-                    Players = players
-                };
-                if (pairRoundMatchup.PlayerTwo != null && pairRoundMatchup.PlayerFour != null)
-                {
-                    prmevm.PlayerTwoId = pairRoundMatchup.PlayerTwo.Id;
-                    prmevm.PlayerTwoBattleScore = pairRoundMatchup.PlayerTwoBattleScore;
-                    prmevm.PlayerTwoSportsmanshipScore = pairRoundMatchup.PlayerTwoSportsmanshipScore;
-                    prmevm.PlayerThreeId = pairRoundMatchup.PlayerThree.Id;
-                    prmevm.PlayerThreeBattleScore = pairRoundMatchup.PlayerThreeBattleScore;
-                    prmevm.PlayerThreeSportsmanshipScore = pairRoundMatchup.PlayerThreeSportsmanshipScore;
-                    prmevm.PlayerFourId = pairRoundMatchup.PlayerFour.Id;
-                    prmevm.PlayerFourBattleScore = pairRoundMatchup.PlayerFourBattleScore;
-                    prmevm.PlayerFourSportsmanshipScore = pairRoundMatchup.PlayerFourSportsmanshipScore;
-                }
-                else
-                {
-                    prmevm.PlayerTwoId = 0.5;
-                    prmevm.PlayerThreeId = 0.5;
-                    prmevm.PlayerFourId = 0.5;
-                }
+                var prmevm = pairRoundMatchup.ToPairRoundMatchupEditViewModel();
+                prmevm.Players = players;
                 return View("PairRoundMatchupEdit", prmevm);
             }
             else
             {
-                var arevm = new RoundMatchupEditViewModel()
-                {
-                    Id = roundMatchup.Id,
-                    RoundNo = roundMatchup.RoundNo,
-                    PlayerOneId = roundMatchup.PlayerOne.Id,
-                    PlayerOneBattleScore = roundMatchup.PlayerOneBattleScore,
-                    PlayerOneSportsmanshipScore = roundMatchup.PlayerOneSportsmanshipScore,
-                    Table = roundMatchup.Table,
-                    Players = players
-                };
-                if (roundMatchup.PlayerTwo != null)
-                {
-                    arevm.PlayerTwoId = roundMatchup.PlayerTwo.Id;
-                    arevm.PlayerTwoBattleScore = roundMatchup.PlayerTwoBattleScore;
-                    arevm.PlayerTwoSportsmanshipScore = roundMatchup.PlayerTwoSportsmanshipScore;
-                }
-                else
-                {
-                    arevm.PlayerTwoId = 0.5;
-                }
+                var arevm = roundMatchup.ToRoundMatchupEditViewModel();
+                arevm.Players = players;
                 return View("RoundMatchupEdit", arevm);
             }
         }
@@ -285,6 +255,14 @@ namespace TableTop2017CoreWeb.Controllers
             if (id != roundMatchupvm.Id)
             {
                 return NotFound();
+            }
+
+            //Check if a player is versing themself or on a team with themself
+            if (roundMatchupvm.PlayerOneId == roundMatchupvm.PlayerTwoId)
+            {
+                TempData["Errors"] = "A player cannot verse themself or be on a team with themself";
+                roundMatchupvm.Players = _context.Players.ToList();
+                return View(roundMatchupvm);
             }
 
             var playerOne = await _context.Players.SingleOrDefaultAsync(p => p.Id == roundMatchupvm.PlayerOneId);
@@ -324,6 +302,7 @@ namespace TableTop2017CoreWeb.Controllers
                 }
                 return RedirectToAction(nameof(AllRounds));
             }
+            roundMatchupvm.Players = _context.Players.ToList();
             return View(roundMatchupvm);
         }
 
@@ -336,6 +315,19 @@ namespace TableTop2017CoreWeb.Controllers
             if (id != pairRoundMatchupvm.Id)
             {
                 return NotFound();
+            }
+
+            //Check if a player is versing themself or on a team with themself
+            if (pairRoundMatchupvm.PlayerOneId == pairRoundMatchupvm.PlayerTwoId
+             || pairRoundMatchupvm.PlayerOneId == pairRoundMatchupvm.PlayerThreeId
+             || pairRoundMatchupvm.PlayerOneId == pairRoundMatchupvm.PlayerFourId
+             || pairRoundMatchupvm.PlayerTwoId == pairRoundMatchupvm.PlayerThreeId
+             || pairRoundMatchupvm.PlayerTwoId == pairRoundMatchupvm.PlayerFourId
+             || pairRoundMatchupvm.PlayerThreeId == pairRoundMatchupvm.PlayerFourId)
+            {
+                TempData["Errors"] = "A player cannot verse themself or be on a team with themself";
+                pairRoundMatchupvm.Players = _context.Players.ToList();
+                return View(pairRoundMatchupvm);
             }
 
             var playerOne = await _context.Players.SingleOrDefaultAsync(p => p.Id == pairRoundMatchupvm.PlayerOneId);
@@ -385,6 +377,7 @@ namespace TableTop2017CoreWeb.Controllers
                 }
                 return RedirectToAction(nameof(AllRounds));
             }
+            pairRoundMatchupvm.Players = _context.Players.ToList();
             return View(pairRoundMatchupvm);
         }
 
@@ -395,7 +388,6 @@ namespace TableTop2017CoreWeb.Controllers
             {
                 TempData["Status"] = "You're good to go!";
             }
-            TempData["DuplicatePlayers"] = string.Join(" | ", errors[0]);
             TempData["DuplicateOpponents"] = string.Join(" | ", errors[1]);
             TempData["OverallocatedPlayers"] = string.Join(" | ", errors[2]);
             TempData["UnallocatedPlayers"] = string.Join(" | ", errors[3]);

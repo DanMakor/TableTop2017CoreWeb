@@ -19,12 +19,12 @@
                 <h4 class="mt-sm text-secondary">Player One</h4>
                 <div class="form-group">
                     <select asp-for="PlayerOneId">
-                    @foreach (var item in Model.Players)
-                    {
-                        <option selected="@(item.Id == Model.PlayerOneId)" value="@item.Id">
-                            @item.Name
-                        </option>
-                    }
+                        @foreach (var item in Model.Players)
+                        {
+                            <option selected="@(item.Id == Model.PlayerOneId)" value="@item.Id">
+                                @item.Name
+                            </option>
+                        }
                     </select>
                     <span asp-validation-for="PlayerOneId" class="text-danger"></span>
                 </div>
@@ -43,12 +43,12 @@
                     <h4 class="mt-sm text-secondary">Player Two</h4>
                     <div class="form-group">
                         <select asp-for="PlayerTwoId">
-                        @foreach (var item in Model.Players)
-                        {
-                            <option selected="@(item.Id == Model.PlayerTwoId)" value="@item.Id">
-                                @item.Name
-                            </option>
-                        }
+                            @foreach (var item in Model.Players)
+                            {
+                                <option selected="@(item.Id == Model.PlayerTwoId)" value="@item.Id">
+                                    @item.Name
+                                </option>
+                            }
                         </select>
                         <span asp-validation-for="PlayerTwoId" class="text-danger"></span>
                     </div>
@@ -71,12 +71,12 @@
                     <h4 class="mt-sm text-secondary">Player Three</h4>
                     <div class="form-group">
                         <select asp-for="PlayerThreeId">
-                        @foreach (var item in Model.Players)
-                        {
-                            <option selected="@(item.Id == Model.PlayerThreeId)" value="@item.Id">
-                                @item.Name
-                            </option>
-                        }
+                            @foreach (var item in Model.Players)
+                            {
+                                <option selected="@(item.Id == Model.PlayerThreeId)" value="@item.Id">
+                                    @item.Name
+                                </option>
+                            }
                         </select>
                         <span asp-validation-for="PlayerThreeId" class="text-danger"></span>
                     </div>
@@ -90,9 +90,10 @@
                         <input asp-for="PlayerThreeSportsmanshipScore" class="form-control" />
                         <span asp-validation-for="PlayerThreeSportsmanshipScore" class="text-danger"></span>
                     </div>
-                } else
+                }
+                else
                 {
-                    
+
                 }
                 @if (Model.PlayerTwoId != 0.5)
                 {
@@ -122,6 +123,7 @@
             </div>
         </div>
     </div>
+    <p class="text-danger">@TempData["Errors"]</p>
     <div class="row">
         <div class="col-md-offset-2 col-md-8 mt-sm">
             <div class="col-md-1">
