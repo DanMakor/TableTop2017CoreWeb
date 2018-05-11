@@ -4,22 +4,21 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore.Storage.Internal;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 using System;
 using TableTop2017CoreWeb.Data;
 
 namespace TableTop2017CoreWeb.Migrations
 {
     [DbContext(typeof(TournamentDbContext))]
-    [Migration("20180413042545_Players RoundMatchups Restructure")]
-    partial class PlayersRoundMatchupsRestructure
+    [Migration("20180510030936_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.2-rtm-10011")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "2.0.3-rtm-10026");
 
             modelBuilder.Entity("TableTop2017CoreWeb.Models.Player", b =>
                 {
@@ -51,22 +50,39 @@ namespace TableTop2017CoreWeb.Migrations
                     b.ToTable("Players");
                 });
 
-            modelBuilder.Entity("TableTop2017CoreWeb.Models.RoundMatchups", b =>
+            modelBuilder.Entity("TableTop2017CoreWeb.Models.Round", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<int>("RoundNo");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Rounds");
+                });
+
+            modelBuilder.Entity("TableTop2017CoreWeb.Models.RoundMatchup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired();
 
                     b.Property<int>("PlayerOneBattleScore");
 
                     b.Property<int?>("PlayerOneId");
 
-                    b.Property<string>("PlayerOneSportsmanshipScore");
+                    b.Property<int>("PlayerOneSportsmanshipScore");
 
                     b.Property<int>("PlayerTwoBattleScore");
 
                     b.Property<int?>("PlayerTwoId");
 
-                    b.Property<string>("PlayerTwoSportsmanshipScore");
+                    b.Property<int>("PlayerTwoSportsmanshipScore");
+
+                    b.Property<int?>("RoundId");
 
                     b.Property<int>("RoundNo");
 
@@ -78,7 +94,36 @@ namespace TableTop2017CoreWeb.Migrations
 
                     b.HasIndex("PlayerTwoId");
 
+                    b.HasIndex("RoundId");
+
                     b.ToTable("RoundMatchups");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("RoundMatchup");
+                });
+
+            modelBuilder.Entity("TableTop2017CoreWeb.Models.PairRoundMatchup", b =>
+                {
+                    b.HasBaseType("TableTop2017CoreWeb.Models.RoundMatchup");
+
+                    b.Property<int>("PlayerFourBattleScore");
+
+                    b.Property<int?>("PlayerFourId");
+
+                    b.Property<int>("PlayerFourSportsmanshipScore");
+
+                    b.Property<int>("PlayerThreeBattleScore");
+
+                    b.Property<int?>("PlayerThreeId");
+
+                    b.Property<int>("PlayerThreeSportsmanshipScore");
+
+                    b.HasIndex("PlayerFourId");
+
+                    b.HasIndex("PlayerThreeId");
+
+                    b.ToTable("PairRoundMatchup");
+
+                    b.HasDiscriminator().HasValue("PairRoundMatchup");
                 });
 
             modelBuilder.Entity("TableTop2017CoreWeb.Models.Player", b =>
@@ -88,7 +133,7 @@ namespace TableTop2017CoreWeb.Migrations
                         .HasForeignKey("CurrentOpponentId");
                 });
 
-            modelBuilder.Entity("TableTop2017CoreWeb.Models.RoundMatchups", b =>
+            modelBuilder.Entity("TableTop2017CoreWeb.Models.RoundMatchup", b =>
                 {
                     b.HasOne("TableTop2017CoreWeb.Models.Player", "PlayerOne")
                         .WithMany()
@@ -97,6 +142,21 @@ namespace TableTop2017CoreWeb.Migrations
                     b.HasOne("TableTop2017CoreWeb.Models.Player", "PlayerTwo")
                         .WithMany()
                         .HasForeignKey("PlayerTwoId");
+
+                    b.HasOne("TableTop2017CoreWeb.Models.Round")
+                        .WithMany("RoundMatchups")
+                        .HasForeignKey("RoundId");
+                });
+
+            modelBuilder.Entity("TableTop2017CoreWeb.Models.PairRoundMatchup", b =>
+                {
+                    b.HasOne("TableTop2017CoreWeb.Models.Player", "PlayerFour")
+                        .WithMany()
+                        .HasForeignKey("PlayerFourId");
+
+                    b.HasOne("TableTop2017CoreWeb.Models.Player", "PlayerThree")
+                        .WithMany()
+                        .HasForeignKey("PlayerThreeId");
                 });
 #pragma warning restore 612, 618
         }
