@@ -39,7 +39,7 @@ namespace TableTop2017CoreWeb.Controllers
         //GET: AdminEdit
         public async Task<IActionResult> Edit(int? id)
         {
-            var aevm = new AdminEditViewModel();
+            var aevm = new AdminEditRoundMatchupsViewModel();
 
             if (id == null)
             {
@@ -50,7 +50,7 @@ namespace TableTop2017CoreWeb.Controllers
             var pairRoundMatchup = await _context.PairRoundMatchups.Where(r => r.Id == id).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Include(r => r.PlayerThree).Include(r => r.PlayerFour).SingleOrDefaultAsync();
             if (roundMatchup != null)
             {
-                aevm.RoundMatchup = new AdminEditRoundMatchupsViewModel
+                aevm = new AdminEditRoundMatchupsViewModel
                 {
                     Id = roundMatchup.Id,
                     PlayerOneId = roundMatchup.PlayerOne.Id,
@@ -59,16 +59,16 @@ namespace TableTop2017CoreWeb.Controllers
                 //If this roundmatchup is not a bye, set PlayerTwoId in the view model to the value of PlayerTwo.Id in the roundMatchup
                 if (roundMatchup.PlayerTwo != null)
                 {
-                    aevm.RoundMatchup.PlayerTwoId = roundMatchup.PlayerTwo.Id;
+                    aevm.PlayerTwoId = roundMatchup.PlayerTwo.Id;
                 }
                 //If this roundmatchup is a bye, set PlayerTwoId in the view model to 0.5 (not 0 because that could be an Id)
                 else
                 {
-                    aevm.RoundMatchup.PlayerTwoId = 0.5;
+                    aevm.PlayerTwoId = 0.5;
                 }
             } else if (pairRoundMatchup != null)
             {
-                aevm.RoundMatchup = new AdminEditRoundMatchupsViewModel
+                aevm = new AdminEditRoundMatchupsViewModel
                 {
                     Id = pairRoundMatchup.Id,
                     PlayerOneId = pairRoundMatchup.PlayerOne.Id,
@@ -77,19 +77,19 @@ namespace TableTop2017CoreWeb.Controllers
                 //If this roundmatchup is not a bye, set PlayerTwoId, PlayerFourId in the view model to the value of PlayerTwo.Id in the roundMatchup
                 if (pairRoundMatchup.PlayerTwo != null)
                 {
-                    aevm.RoundMatchup.PlayerTwoId = pairRoundMatchup.PlayerTwo.Id;
-                    aevm.RoundMatchup.PlayerThreeId = pairRoundMatchup.PlayerThree.Id;
-                    aevm.RoundMatchup.PlayerFourId = pairRoundMatchup.PlayerFour.Id;
+                    aevm.PlayerTwoId = pairRoundMatchup.PlayerTwo.Id;
+                    aevm.PlayerThreeId = pairRoundMatchup.PlayerThree.Id;
+                    aevm.PlayerFourId = pairRoundMatchup.PlayerFour.Id;
                 }
                 //If this roundmatchup is a bye, set PlayerTwoId, PlayerFourId in the view model to 0.5 (not 0 because that could be an Id)
                 else
                 {
-                    aevm.RoundMatchup.PlayerTwoId = 0.5;
-                    aevm.RoundMatchup.PlayerThreeId = 0.5;
-                    aevm.RoundMatchup.PlayerFourId = 0.5;
+                    aevm.PlayerTwoId = 0.5;
+                    aevm.PlayerThreeId = 0.5;
+                    aevm.PlayerFourId = 0.5;
                 }
             }
-            if (aevm.RoundMatchup == null)
+            if (aevm == null)
             {
                 return NotFound();
             }
@@ -107,8 +107,17 @@ namespace TableTop2017CoreWeb.Controllers
                 return NotFound();
             }
 
-            //Check if a player is versing themself or on a team with themself
-            if (roundMatchup.PlayerOneId == roundMatchup.PlayerTwoId 
+            //Check if a player is versing themself or on a team with themself in a standard round
+            if (roundMatchup.PlayerThreeId == 0.5 && roundMatchup.PlayerFourId == 0.5) {
+                if (roundMatchup.PlayerOneId == roundMatchup.PlayerTwoId)
+                {
+                    TempData["Errors"] = "A player cannot verse themself or be on a team with themself";
+                    roundMatchup.Players = _context.Players.ToList();
+                    return View(roundMatchup);
+                }
+            }
+            //Check if a player is versing themself or on a team with themself in a pair round
+            else if (roundMatchup.PlayerOneId == roundMatchup.PlayerTwoId 
              || roundMatchup.PlayerOneId == roundMatchup.PlayerThreeId 
              || roundMatchup.PlayerOneId == roundMatchup.PlayerFourId
              || roundMatchup.PlayerTwoId == roundMatchup.PlayerThreeId
@@ -116,11 +125,8 @@ namespace TableTop2017CoreWeb.Controllers
              || roundMatchup.PlayerThreeId == roundMatchup.PlayerFourId)
             {
                 TempData["Errors"] = "A player cannot verse themself or be on a team with themself";
-                var adminEditViewModel1 = new AdminEditViewModel() {
-                    RoundMatchup = roundMatchup,
-                    Players = _context.Players.ToList()
-                };
-                return View(adminEditViewModel1);
+                roundMatchup.Players = _context.Players.ToList();
+                return View(roundMatchup);
             }
             PairRoundMatchup updatedPairRoundMatchup = null;
             RoundMatchup updatedRoundMatchup = null;
@@ -137,9 +143,7 @@ namespace TableTop2017CoreWeb.Controllers
                 updatedRoundMatchup.PlayerOne = _context.Players.FirstOrDefault(p => p.Id == roundMatchup.PlayerOneId);
                 updatedRoundMatchup.PlayerTwo = _context.Players.FirstOrDefault(p => p.Id == roundMatchup.PlayerTwoId);
             }
-                
-            
-
+                          
             if (ModelState.IsValid)
             {
                 try
@@ -168,12 +172,8 @@ namespace TableTop2017CoreWeb.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            var adminEditViewModel = new AdminEditViewModel()
-            {
-                RoundMatchup = roundMatchup,
-                Players = _context.Players.ToList()
-            };
-            return View(adminEditViewModel);
+            roundMatchup.Players = _context.Players.ToList();
+            return View(roundMatchup);
         }
 
         public ActionResult ValidateRoundMatchups()
@@ -194,19 +194,25 @@ namespace TableTop2017CoreWeb.Controllers
         {
             int roundNo = RoundMatchupActions.GetLastRoundNo(_context);
             Boolean pairRoundMatchup = false;
-            foreach (RoundMatchup roundMatchup in _context.RoundMatchups.Where(r => r.RoundNo == roundNo).ToList())
+            foreach (RoundMatchup roundMatchup in _context.RoundMatchups.Include(r => r.PlayerTwo).Where(r => r.RoundNo == roundNo).ToList())
             {
-                if (roundMatchup is PairRoundMatchup) { pairRoundMatchup = true; }
+                if (roundMatchup is PairRoundMatchup && roundMatchup.PlayerTwo != null) { pairRoundMatchup = true; }
                 _context.Remove(roundMatchup);
             }
              _context.SaveChanges();
             if (pairRoundMatchup == true)
             {
-                RoundMatchupActions.GenerateNextPairRound( _context);
+                if (RoundMatchupActions.GenerateNextPairRound(_context) == false)
+                {
+                    TempData["Errors"] = "There are no unique matchups left, manual selection will be required (Random Matchups have been allocated where opponents from last round are teammates)";
+                }
             }
             else
             {
-                RoundMatchupActions.GenerateNextRound(_context);
+                if (RoundMatchupActions.GenerateNextRound(_context) == false)
+                {
+                    TempData["Errors"] = "There are no unique matchups left, manual selection will be required (Matchups are generated based on most evenly skilled players according to BattleScore, with no regard for previous opponents)";
+                }
             }
             return RedirectToAction(nameof(Index), "Admin");
         }
@@ -228,7 +234,7 @@ namespace TableTop2017CoreWeb.Controllers
             var roundMatchups = _context.RoundMatchups.Where(r => !(r is PairRoundMatchup)).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).ToList();
             var pairRoundMatchups = _context.PairRoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Include(r => r.PlayerThree).Include(r => r.PlayerFour).ToList();
 
-            return View(roundMatchups.Union(pairRoundMatchups));
+            return View(roundMatchups.Union(pairRoundMatchups).OrderBy(r => r.RoundNo));
         }
 
         //GET: AllRoundsEdit (Edit one round)

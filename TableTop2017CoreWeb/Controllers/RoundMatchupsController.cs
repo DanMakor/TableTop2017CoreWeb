@@ -84,14 +84,6 @@ namespace TableTop2017CoreWeb.Controllers
             return View(roundMatchups.Union(pairRoundMatchups));
         }
 
-        //Generate the RoundMatchups 
-        public ActionResult GenerateRoundMatchups()
-        {
-            RoundMatchupActions.GenerateNextRound(_context);
-            return RedirectToAction("Index", "Admin");
-        }
-        
-
         // GET: RoundMatchups/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
