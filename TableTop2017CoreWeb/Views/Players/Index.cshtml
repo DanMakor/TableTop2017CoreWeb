@@ -6,13 +6,10 @@
 }
 
 <div class="jumbotron mt-sm">
-    <h1>TableTop</h1>
+    <h1 class>TableTop</h1>
     <p class="lead">Tournament bracket generation software for tabletop war gaming</p>
 </div>
-<div class="col-md-3 mt-sm">
-    @Html.ActionLink("Reroute to Players Display Page", "PlayersDisplay", "Rounds", null, new { @class = "btn btn-primary" })
-</div>
-@*
+
 <div class="row mt-sm">
     <div class="col-md-3">
         <form name="Tables" action="#">
@@ -22,89 +19,118 @@
     </div>
 
     <div class="col-md-3">
-         <h4 class="text-primary">Click to Add new Players</h4>
-         @Html.ActionLink("Add Player", "Create", "Players", null,new { @class = "btn btn-primary" })
+        <h4 class="text-primary">Click to Add new Players</h4>
+        @Html.ActionLink("Add Player", "Create", "Players", null, new { @class = "btn btn-primary" })
+    </div>
+
+    <div class="col-md-4">
+        <h4 class="text-primary">Click to Update Tournament weighting</h4>
+        @Html.ActionLink("Update Weighting", "Edit/1", "Tournaments", null, new { @class = "btn btn-primary" })
     </div>
 
 </div>
 
-<div class="col-md-12 mt-sm">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Name)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.BattleScore)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.SportsmanshipScore)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Army)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Active)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.EmailAddress)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Notes)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Paid)
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.BattleScore)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.SportsmanshipScore)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Army)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Active)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EmailAddress)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Notes)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Paid)
-                </td>     
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
-            }
-        </tbody>
-    </table>
+<div class="row">
+    <div class="col-md-12 mt-sm">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.BattleScore)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SportsmanshipScore)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ArmyScore)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.WeightedScore)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Army)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Active)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Bye)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.EmailAddress)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Notes)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Paid)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.BattleScore)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SportsmanshipScore)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ArmyScore)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WeightedScore)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Army)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Active)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Bye)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EmailAddress)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Notes)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Paid)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row mt-xs">
+    <p class="alert-danger">@ViewData["Errors"]</p>
 </div>
 
 <div class="col-md-3 mt-sm">
-    @Html.ActionLink("Generate Round", "DisplayNextRound", "Admin", null, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Generate Round", "DisplayNextRound", "RoundMatchups", null, new { @class = "btn btn-primary" })
 </div>
 <div class="col-md-3 mt-sm">
-    @Html.ActionLink("Generate Pair Round", "DisplayNextPairRound", "Admin", null, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Generate Pair Round", "DisplayNextPairRound", "RoundMatchups", null, new { @class = "btn btn-primary" })
 </div>
-    *@
+
 @section scripts{
     <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
 }

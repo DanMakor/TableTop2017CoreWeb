@@ -12,10 +12,10 @@
     @if (!bye)
     {
         <td>
-            @Html.DisplayFor(model => model.PlayerOne.SportsmanshipScore)
+            @Html.DisplayFor(model => model.PlayerOneSportsmanshipScore)
         </td>
         <td>
-            @Html.DisplayFor(model => model.PlayerOne.BattleScore)
+            @Html.DisplayFor(model => model.PlayerOneBattleScore)
         </td>
     }
     else
@@ -50,14 +50,14 @@
             @Html.DisplayFor(model => model.PlayerTwo.Name)
         </td>
         <td>
-            @Html.DisplayFor(model => model.PlayerTwo.BattleScore)
+            @Html.DisplayFor(model => model.PlayerTwoBattleScore)
         </td>
         <td>
-            @Html.DisplayFor(model => model.PlayerTwo.SportsmanshipScore)
+            @Html.DisplayFor(model => model.PlayerTwoSportsmanshipScore)
         </td>
     }
     <td>
-        <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+        @if (!bye){ <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> }
     </td>
 </tr>
 

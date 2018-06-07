@@ -34,7 +34,7 @@
                 <input type="submit" name="submitButton" value="GoToDisplayNextRound" class="btn btn-primary" />
             </div>
             <div class="form-group col-md-6">
-                <input type="submit" name="submitButton" value="GoToDisplayNextRound" class="btn btn-primary" />
+                <input type="submit" name="submitButton" value="GoToDisplayNextPairRound" class="btn btn-primary" />
             </div>
         </form>
     </div>
@@ -51,104 +51,133 @@
         <thead>
             <tr>
                 @{
-                    if (Model.Players.Count > 0)
-                    {
-                        <th>
-                            @Html.DisplayNameFor(model => model.Players.First().Name)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Players.First().BattleScore)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Players.First().SportsmanshipScore)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Players.First().Army)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Players.First().Active)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Players.First().EmailAddress)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Players.First().Notes)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Players.First().Paid)
-                        </th>
-                        <th></th>
-                    }
-                    else
-                    {
-                        <th>
-                            Name
-                        </th>
-                        <th>
-                            Battle Score
-                        </th>
-                        <th>
-                            Sportsmanship Score
-                        </th>
-                        <th>
-                            Army
-                        </th>
-                        <th>
-                            Active
-                        </th>
-                        <th>
-                            Email Address
-                        </th>
-                        <th>
-                            Notes
-                        </th>
-                        <th>
-                            Paid
-                        </th>
-                        <th></th>
+        if (Model.Players.Count > 0)
+        {
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().BattleScore)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().SportsmanshipScore)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().ArmyScore)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().WeightedScore)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().Army)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().Active)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().Bye)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().EmailAddress)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().Notes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().Paid)
+            </th>
+            <th></th>
+}
+else
+{
+            <th>
+                Name
+            </th>
+            <th>
+                Battle Score
+            </th>
+            <th>
+                Sportsmanship Score
+            </th>
+            <th>
+                Army Score
+            </th>
+            <th>
+                 Weighted Score
+            </th>
+            <th>
+                Army
+            </th>
+            <th>
+                Active
+            </th>
+            <th>
+                Bye
+            </th>
+            <th>
+                Email Address
+            </th>
+            <th>
+                Notes
+            </th>
+            <th>
+                Paid
+            </th>
+            <th></th>
 
-                    }
+}
                 }
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model.Players)
             {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.BattleScore)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.SportsmanshipScore)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Army)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Active)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.EmailAddress)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Notes)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Paid)
-                    </td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    </td>
-                </tr>
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BattleScore)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SportsmanshipScore)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ArmyScore)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WeightedScore)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Army)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Active)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Bye)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EmailAddress)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Notes)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Paid)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
             }
         </tbody>
     </table>
 </div>
-
+<div class="row mt-xs">
+    <p class="alert-danger">@ViewData["Errors"]</p>
+</div>
 
 <div class="col-md-6">
     <form asp-action="GoToAction">
@@ -163,7 +192,7 @@
             <input type="submit" name="submitButton" value="GoToDisplayNextRound" class="btn btn-primary" />
         </div>
         <div class="form-group col-md-6">
-            <input type="submit" name="submitButton" value="GoToDisplayNextRound" class="btn btn-primary" />
+            <input type="submit" name="submitButton" value="GoToDisplayNextPairRound" class="btn btn-primary" />
         </div>
     </form>
 </div>

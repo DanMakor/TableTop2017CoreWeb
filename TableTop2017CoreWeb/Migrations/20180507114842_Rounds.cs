@@ -13,12 +13,7 @@ namespace TableTop2017CoreWeb.Migrations
                 name: "RoundsModelId",
                 table: "RoundMatchups",
                 nullable: true);
-
-            migrationBuilder.AddColumn<int>(
-                name: "RoundsModelId",
-                table: "Players",
-                nullable: true);
-
+            
             migrationBuilder.CreateTable(
                 name: "RoundsModel",
                 columns: table => new

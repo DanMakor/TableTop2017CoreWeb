@@ -18,8 +18,6 @@ namespace TableTop2017CoreWeb.Helpers
 
         public static int GetLastRoundNo(TournamentDbContext _context)
         {
-            
-            
             int lastRoundNo = 0;
             RoundMatchup lastRound =  _context.RoundMatchups.LastOrDefault();
             if (lastRound != null)
@@ -27,7 +25,6 @@ namespace TableTop2017CoreWeb.Helpers
                 lastRoundNo = lastRound.RoundNo;
             }
             return lastRoundNo;
-            
         }
 
         /**
@@ -35,15 +32,14 @@ namespace TableTop2017CoreWeb.Helpers
          * Round Generation
          * 
          **/
-        public static void GenerateNextRound(TournamentDbContext _context)
+        public static Boolean GenerateNextRound(TournamentDbContext _context)
         {
-            List<Player> players = _context.Players.OrderByDescending(p => p.BattleScore).ToList();
-            RoundMatchupActions myActions = new RoundMatchupActions();
+            List<Player> players = _context.Players.Where(p => p.Active && p.Bye == false && p.Name != "Bye").OrderByDescending(p => p.BattleScore).ToList();
             List<int> AllocatedTables = new List<int>(GetNoOfTables(_context));
+            Boolean error = false;
             int secondaryIndex = 0;
             int i = 0;
-            
-            while (i < players.Count)
+            while (i < players.Count && i >= 0)
             {
                 //Skip this player if they are already allocated an opponent
                 if (players[i].CurrentOpponent == null)
@@ -53,6 +49,12 @@ namespace TableTop2017CoreWeb.Helpers
 
                     for (s = secondaryIndex; s < players.Count; s++)
                     {
+                        //If there are no more unique matchups exit
+                        if (i == -1) {
+                            i = -2;
+                            error = true;
+                            break;
+                        }
                         if (players[s].CurrentOpponent == null)
                         {
 
@@ -116,6 +118,14 @@ namespace TableTop2017CoreWeb.Helpers
                                     }
                                     //Set the new player to be allocated to the highest member of the lowestAllocatedPair
                                     i = players.IndexOf(lowestAllocatedPair) - 1;
+
+                                    //If there are no more unique matchups exit
+                                    if (i == -1)
+                                    {
+                                        i = -2;
+                                        error = true;
+                                        break;
+                                    }
                                     //Set the starting player that will be tested for allocation suitability to one rank lower than 
                                     //the opponent of the highest member of the allocated pair
                                     secondaryIndex = players.IndexOf(lowestAllocatedPair.CurrentOpponent) + 1;
@@ -132,28 +142,46 @@ namespace TableTop2017CoreWeb.Helpers
                 i++;
             }
 
-            int newRound = GetLastRoundNo(_context) + 1;
-            //int roundNum = _context.RoundsModel.LastOrDefault().RoundNo;
-
+            int newRoundNo = GetLastRoundNo(_context) + 1;
             foreach (Player player in players)
             {
                 if (players.IndexOf(player) < players.IndexOf(player.CurrentOpponent))
                 {
-                    RoundMatchup roundMatchup = new RoundMatchup
+                    var roundMatchup = new RoundMatchup
                     {
-                        RoundNo = newRound,
+                        RoundNo = newRoundNo,
                         PlayerOne = player,
                         PlayerTwo = player.CurrentOpponent
                     };
 
                     //allocates table for matchup
-                    
-                    
                     roundMatchup.Table = AllocateTable(GetTables(player, _context), AllocatedTables, _context);
-                    //AllocatedTables.Add(roundMatchup.Table);
                     _context.Add(roundMatchup);
                 }
+                //If there are no more unique matchups
+                if (error)
+                {
+                    //RoundMatchup will hold each pair of players closest to each other in BattleScore
+                    //E.G (List ordered by BattleScore) players[0] vs players[1] | players[2] vs players[3]
+                    if (player.CurrentOpponent == null && players[players.IndexOf(player) + 1] != null)
+                    {
+                        player.CurrentOpponent = players[players.IndexOf(player) + 1];
+                        player.CurrentOpponent.CurrentOpponent = player;
+                        var roundMatchup = new RoundMatchup
+                        {
+                            RoundNo = newRoundNo,
+                            PlayerOne = player,
+                            PlayerTwo = player.CurrentOpponent
+                        };
+
+                        roundMatchup.Table = AllocateTable(GetTables(player, _context), AllocatedTables, _context);
+                        _context.Add(roundMatchup);
+                    }
+                }
+
             }
+
+            CreateByeRounds(_context.Players.Where(p => p.Active && p.Bye && p.Name != "Bye").ToList(), newRoundNo, _context);
 
             foreach (Player player in players)
             {
@@ -162,28 +190,38 @@ namespace TableTop2017CoreWeb.Helpers
             }
 
             _context.SaveChanges();
+
+            if (error)
+                return false;
+            return true;
         }
 
-        public static void GenerateNextPairRound(TournamentDbContext _context)
+        public static Boolean GenerateNextPairRound(TournamentDbContext _context)
         {
+            Boolean error = false;
             int lastRound = GetLastRoundNo(_context);
-            List<RoundMatchup> roundMatchups = _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Where(r => r.RoundNo == lastRound).ToList();
+            var roundMatchups = _context.RoundMatchups.Where(r => !(r is PairRoundMatchup)).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Where(r => r.RoundNo == lastRound).ToList();
+            var pairRoundMatchups = _context.PairRoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Include(r => r.PlayerThree).Include(r => r.PlayerFour).Where(r => r.RoundNo == lastRound).ToList();
+            List<Player> activePlayers = _context.Players.Where(p => p.Active && p.Bye == false).ToList();
+            List<Player> activeByePlayers = new List<Player>();
             List<PlayerPair> playerPairs = new List<PlayerPair>();
-            foreach (RoundMatchup roundMatchup in roundMatchups)
+            roundMatchups = roundMatchups.Union(pairRoundMatchups).ToList();
+
+            if (roundMatchups != null)
             {
-                PlayerPair pair = new PlayerPair()
-                {
-                    First = roundMatchup.PlayerOne,
-                    Second = roundMatchup.PlayerTwo
-                };
-                playerPairs.Add(pair);
+                Tuple<List<PlayerPair>, List<Player>> playerPairsAndByes = (RoundMatchupActions.GetPlayerPairs(roundMatchups, activePlayers));
+                playerPairs = playerPairsAndByes.Item1;
+                activeByePlayers = playerPairsAndByes.Item2;
+            } else
+            {
+                error = true;
             }
 
             //List<int> AllocatedTables = new List<int>(GetnoOfTables());
             int secondaryIndex = 0;
             int i = 0;
 
-            while (i < playerPairs.Count)
+            while (i < playerPairs.Count && i >= 0)
             {
                 //Skip this player if they are already allocated an opponent
                 if (playerPairs[i].CurrentOpponent == null)
@@ -193,9 +231,15 @@ namespace TableTop2017CoreWeb.Helpers
 
                     for (s = secondaryIndex; s < playerPairs.Count; s++)
                     {
+                        //If there are no more unique matchups, exit
+                        if (i == -1)
+                        {
+                            i = -2;
+                            error = true;
+                            break;
+                        }
                         if (playerPairs[s].CurrentOpponent == null)
                         {
-
                             //Check if higher player has ever played lower player
                             var playerOneOpponents = PlayerActions.GetAllOpponents(playerPairs[i].First, _context);
                             var playerTwoOpponents = PlayerActions.GetAllOpponents(playerPairs[i].Second, _context);
@@ -258,6 +302,15 @@ namespace TableTop2017CoreWeb.Helpers
                                     }
                                     //Set the new player to be allocated to the highest member of the lowestAllocatedPair
                                     i = playerPairs.IndexOf(lowestAllocatedPair) - 1;
+
+                                    //If there are no more unique matchups, exit
+                                    if (i == -1)
+                                    {
+                                        i = -2;
+                                        error = true;
+                                        break;
+                                    }
+
                                     //Set the starting player that will be tested for allocation suitability to one rank lower than 
                                     //the opponent of the highest member of the allocated pair
                                     secondaryIndex = playerPairs.IndexOf(lowestAllocatedPair.CurrentOpponent) + 1;
@@ -266,20 +319,26 @@ namespace TableTop2017CoreWeb.Helpers
                                     lowestAllocatedPair.CurrentOpponent.CurrentOpponent = null;
                                     lowestAllocatedPair.CurrentOpponent = null;
                                 }
+                                else
+                                {
+                                    i = -2;
+                                    error = true;
+                                    break;
+                                }
                             }
                         }
                     }
                 }
                 i++;
             }
-            int newRound = lastRound + 1;
+            int newRoundNo = lastRound + 1;
             foreach (PlayerPair playerPair in playerPairs)
             {
                 if (playerPairs.IndexOf(playerPair) < playerPairs.IndexOf(playerPair.CurrentOpponent))
                 {
-                    PairRoundMatchup roundMatchup = new PairRoundMatchup
+                    var roundMatchup = new PairRoundMatchup
                     {
-                        RoundNo = newRound,
+                        RoundNo = newRoundNo,
                         PlayerOne = playerPair.First,
                         PlayerTwo = playerPair.Second,
                         PlayerThree = playerPair.CurrentOpponent.First,
@@ -291,9 +350,199 @@ namespace TableTop2017CoreWeb.Helpers
 
                     _context.Add(roundMatchup);
                 }
+                //If there are no more unique matchups
+                if (error)
+                {
+                    //RoundMatchup will hold random pair matchups where teammates were opponents last round unless their opponent is no longer active or has a bye
+                    if (playerPair.CurrentOpponent == null && playerPairs[playerPairs.IndexOf(playerPair) + 1] != null)
+                    {
+                        playerPair.CurrentOpponent = playerPairs[playerPairs.IndexOf(playerPair) + 1];
+                        playerPair.CurrentOpponent.CurrentOpponent = playerPair;
+                        var roundMatchup = new PairRoundMatchup
+                        {
+                            RoundNo = newRoundNo,
+                            PlayerOne = playerPair.First,
+                            PlayerTwo = playerPair.Second,
+                            PlayerThree = playerPair.CurrentOpponent.First,
+                            PlayerFour = playerPair.CurrentOpponent.Second
+                        };
+                        _context.Add(roundMatchup);
+                    }
+                }
             }
 
+            CreateByeRounds(activeByePlayers, newRoundNo, _context);
+
             _context.SaveChanges();
+
+            if (error)
+                return false;
+            return true;
+        }
+
+        public static Tuple<List<PlayerPair>, List<Player>> GetPlayerPairs(List<RoundMatchup> roundMatchups, List<Player> activePlayers) {
+
+            List<Player> activeUnallocatedPlayers = new List<Player>();
+            List<Player> activeByePlayers = new List<Player>();
+            List<Player> lastRoundPlayers = new List<Player>();
+            List<PlayerPair> playerPairs = new List<PlayerPair>();
+
+            foreach (RoundMatchup roundMatchup in roundMatchups)
+            {
+                //If last round was a bye
+                if (roundMatchup.PlayerTwo == null)
+                {
+                    //If the player who played in the bye matchup is active add them to the activeUnallocatedPlayers as they have no previous opponent to be matched against
+                    if (roundMatchup.PlayerOne.Active == true)
+                    {
+                        activeUnallocatedPlayers.Add(roundMatchup.PlayerOne);
+                    }
+                }
+                else
+                {
+                    //Populate a list full of all the players that played last round
+                    lastRoundPlayers.Add(roundMatchup.PlayerOne);
+                    lastRoundPlayers.Add(roundMatchup.PlayerTwo);
+                    if (!(roundMatchup is PairRoundMatchup))
+                    {
+                        if (roundMatchup.PlayerOne.Active && roundMatchup.PlayerOne.Bye == false && roundMatchup.PlayerTwo.Active && roundMatchup.PlayerTwo.Bye == false)
+                        {
+                            playerPairs.Add(new PlayerPair()
+                            {
+                                First = roundMatchup.PlayerOne,
+                                Second = roundMatchup.PlayerTwo
+                            });
+                        }
+
+                        //If PlayerOne from this roundmatchup last round is inactive, add PlayerTwo to the unallocated players list
+                        else if (roundMatchup.PlayerOne.Active == false || roundMatchup.PlayerOne.Bye == true && roundMatchup.PlayerTwo.Active && roundMatchup.PlayerTwo.Bye == false)
+                        {
+                            activeUnallocatedPlayers.Add(roundMatchup.PlayerTwo);
+                        }
+
+                        //If PlayerTwo from this roundmatchup last round is inactive, add PlayerOne to the unallocated players list
+                        else if (roundMatchup.PlayerTwo.Active == false || roundMatchup.PlayerTwo.Bye == true && roundMatchup.PlayerOne.Active && roundMatchup.PlayerOne.Bye == false)
+                        {
+                            activeUnallocatedPlayers.Add(roundMatchup.PlayerOne);
+                        }
+                        //If PlayerOne or PlayerTwo have a bye and are active, add both to the unallocated players list (will filter which player has a bye later)
+                        else if ((roundMatchup.PlayerOne.Bye && roundMatchup.PlayerOne.Active) || (roundMatchup.PlayerTwo.Bye && roundMatchup.PlayerTwo.Active))
+                        {
+                            activeUnallocatedPlayers.Add(roundMatchup.PlayerOne);
+                            activeUnallocatedPlayers.Add(roundMatchup.PlayerTwo);
+                        }
+                    }
+                    else
+                    {
+                        var pairRoundMatchup = roundMatchup as PairRoundMatchup;
+                        //Populate a list full of all the players that played last round
+
+                        lastRoundPlayers.Add(pairRoundMatchup.PlayerThree);
+                        lastRoundPlayers.Add(pairRoundMatchup.PlayerFour);
+                        lastRoundPlayers.Add(pairRoundMatchup.PlayerOne);
+                        lastRoundPlayers.Add(pairRoundMatchup.PlayerTwo);
+                        
+                        if (pairRoundMatchup.PlayerOne.Active && pairRoundMatchup.PlayerOne.Bye == false && pairRoundMatchup.PlayerThree.Active && pairRoundMatchup.PlayerThree.Bye == false)
+                        {
+                            playerPairs.Add(new PlayerPair()
+                            {
+                                First = pairRoundMatchup.PlayerOne,
+                                Second = pairRoundMatchup.PlayerThree
+                            });
+                        }
+
+                        //If PlayerOne from this pairRoundMatchup last round is inactive, add PlayerTwo to the unallocated players list
+                        else if (pairRoundMatchup.PlayerOne.Active == false || pairRoundMatchup.PlayerOne.Bye == true && pairRoundMatchup.PlayerThree.Active && pairRoundMatchup.PlayerThree.Bye == false)
+                        {
+                            activeUnallocatedPlayers.Add(pairRoundMatchup.PlayerThree);
+                        }
+
+                        //If PlayerTwo from this pairRoundMatchup last round is inactive, add PlayerOne to the unallocated players list
+                        else if (pairRoundMatchup.PlayerThree.Active == false || pairRoundMatchup.PlayerThree.Bye == true && pairRoundMatchup.PlayerOne.Active && pairRoundMatchup.PlayerOne.Bye == false)
+                        {
+                            activeUnallocatedPlayers.Add(pairRoundMatchup.PlayerOne);
+                        }
+                        //If PlayerOne or PlayerTwo have a bye and are active, add both to the unallocated players list (will filter which player has a bye later)
+                        else if ((pairRoundMatchup.PlayerOne.Bye && pairRoundMatchup.PlayerOne.Active) || (pairRoundMatchup.PlayerThree.Bye && pairRoundMatchup.PlayerThree.Active))
+                        {
+                            activeUnallocatedPlayers.Add(pairRoundMatchup.PlayerOne);
+                            activeUnallocatedPlayers.Add(pairRoundMatchup.PlayerThree);
+                        }
+
+                        if (pairRoundMatchup.PlayerTwo.Active && pairRoundMatchup.PlayerTwo.Bye == false && pairRoundMatchup.PlayerFour.Active && pairRoundMatchup.PlayerFour.Bye == false)
+                        {
+                            playerPairs.Add(new PlayerPair()
+                            {
+                                First = pairRoundMatchup.PlayerTwo,
+                                Second = pairRoundMatchup.PlayerFour
+                            });
+                        }
+                        else if (pairRoundMatchup.PlayerTwo.Active == false || pairRoundMatchup.PlayerTwo.Bye == true && pairRoundMatchup.PlayerFour.Active && pairRoundMatchup.PlayerFour.Bye == false)
+                        {
+                            activeUnallocatedPlayers.Add(pairRoundMatchup.PlayerFour);
+                        }
+                        //If PlayerOne from this roundmatchup last round is inactive, add PlayerOne to the unallocated players list
+                        else if (pairRoundMatchup.PlayerFour.Active == false || pairRoundMatchup.PlayerFour.Bye == true && pairRoundMatchup.PlayerTwo.Active && pairRoundMatchup.PlayerTwo.Bye == false)
+                        {
+                            activeUnallocatedPlayers.Add(pairRoundMatchup.PlayerTwo);
+                        }
+                        //If PlayerThree or PlayerFour have a bye and are active, add both to the unallocated players list (will filter which player has a bye later)
+                        else if ((pairRoundMatchup.PlayerTwo.Bye && pairRoundMatchup.PlayerTwo.Active) || (pairRoundMatchup.PlayerFour.Bye && pairRoundMatchup.PlayerFour.Active))
+                        {
+                            activeUnallocatedPlayers.Add(pairRoundMatchup.PlayerTwo);
+                            activeUnallocatedPlayers.Add(pairRoundMatchup.PlayerFour);
+                        }
+                    }
+                }
+            }
+            //Currently we are matching pairRound teammates from the prevoius round as teammates again
+            //Abstract out the checking if the players are active
+
+            foreach (Player activePlayer in activePlayers)
+            {
+                Boolean playedLastRound = false;
+                foreach (Player lastRoundPlayer in lastRoundPlayers)
+                {
+                    if (activePlayer == lastRoundPlayer)
+                        playedLastRound = true;
+                }
+                if (playedLastRound == false)
+                    activeUnallocatedPlayers.Add(activePlayer);
+            }
+
+            //Separate the unallocated players that have a bye and those that don't
+            activeByePlayers = activeUnallocatedPlayers.Where(p => p.Bye && p.Active).ToList();
+            activeUnallocatedPlayers.RemoveAll(p => p.Bye);
+
+            //Loop through the active unallocated players
+            foreach (Player activeUnallocatedPlayer in activeUnallocatedPlayers)
+            {
+                if ((activeUnallocatedPlayers.IndexOf(activeUnallocatedPlayer) + 1) < activeUnallocatedPlayers.Count())
+                {
+                    playerPairs.Add(new PlayerPair()
+                    {
+                        First = activeUnallocatedPlayer,
+                        Second = activeUnallocatedPlayers[activeUnallocatedPlayers.IndexOf(activeUnallocatedPlayer) + 1]
+                    });
+                } else
+                {
+                    //errorMessage = "Odd number of players in the pair matchups" 
+                }
+            }
+
+            return Tuple.Create(playerPairs, activeByePlayers);
+        }
+
+        public static void CreateByeRounds(List<Player> activeByePlayers, int roundNo, TournamentDbContext _context)
+        {
+            foreach (Player activeByePlayer in activeByePlayers)
+            {
+                _context.Add(new PairRoundMatchup()
+                {
+                    RoundNo = roundNo,
+                    PlayerOne = activeByePlayer
+                });
+            }
         }
 
         /**
@@ -309,105 +558,88 @@ namespace TableTop2017CoreWeb.Helpers
         public static List<List<string>> GetRoundMatchupErrors(TournamentDbContext _context)
         {
 
-            var roundMatchups = _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).OrderByDescending(r => r.PlayerOne.BattleScore).ToList();
+            var preSortedRoundMatchups = _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Where(r => !(r is PairRoundMatchup) && r.PlayerTwo.Name != "Bye").ToList();
+            var preSortedPairRoundMatchups = _context.RoundMatchups.OfType<PairRoundMatchup>().Include(r => r.PlayerOne).Include(r => r.PlayerThree).Where(r => r.PlayerThree.Name != "Bye").ToList();
+            List<RoundMatchup> roundMatchups = preSortedRoundMatchups.Union(preSortedPairRoundMatchups).OrderBy(r => r.RoundNo).ToList();
 
             List<string> duplicatePlayers = new List<string>();
             List<string> duplicateOpponents = new List<string>();
             List<string> unallocatedPlayers = new List<string>();
             List<string> overallocatedPlayers = new List<string>();
-            Dictionary<string, int> playerRoundCount = new Dictionary<string, int>();
+            Dictionary<Player, int> playerRoundCount = new Dictionary<Player, int>();
             List<Player> players = _context.Players.ToList();
             foreach (Player player in players)
             {
-                playerRoundCount.Add(player.Name, 0);
+                playerRoundCount.Add(player, 0);
             }
 
-            List<String> tempDuplicatePlayers = new List<string>();
             foreach (RoundMatchup roundMatchup in roundMatchups)
             {
-                if (roundMatchup is PairRoundMatchup)
-                {
-                    var pairRoundMatchup = roundMatchup as PairRoundMatchup;
-                    // Check if PlayerOne is on a team with themself
-                    if (pairRoundMatchup.PlayerOne == pairRoundMatchup.PlayerTwo)
-                    {
-                        duplicatePlayers.Add(pairRoundMatchup.PlayerOne.Name + " is on a team with themself in round " + pairRoundMatchup.RoundNo);
-                    }
-                    // Check if PlayerOne is playing themself
-                    if (pairRoundMatchup.PlayerOne == pairRoundMatchup.PlayerThree || pairRoundMatchup.PlayerOne == pairRoundMatchup.PlayerFour)
-                    {
-                        duplicatePlayers.Add(pairRoundMatchup.PlayerOne.Name + " is playing themself in round " + pairRoundMatchup.RoundNo);
-                    }
-                    //Check if PlayerTwo is playing themself
-                    if (pairRoundMatchup.PlayerTwo == pairRoundMatchup.PlayerThree || pairRoundMatchup.PlayerTwo == pairRoundMatchup.PlayerFour)
-                    {
-                        duplicatePlayers.Add(pairRoundMatchup.PlayerTwo.Name + " is playing themself in round " + pairRoundMatchup.RoundNo);
-                    }
-                    //Check if PlayerThree is on a team with themself
-                    if (pairRoundMatchup.PlayerThree == pairRoundMatchup.PlayerFour)
-                    {
-                        duplicatePlayers.Add(pairRoundMatchup.PlayerThree.Name + " is on a team with themself in round " + pairRoundMatchup.RoundNo);
-                    }
-                }
-                //Check if there are any players versing themselves
-                else if (!(roundMatchup is PairRoundMatchup))
-                {
-                    if (roundMatchup.PlayerOne == roundMatchup.PlayerTwo)
-                    {
-                        duplicatePlayers.Add(roundMatchup.PlayerOne.Name + " is playing themself in round " + roundMatchup.RoundNo);
-                    }
-                }
+
                 //Check if there are players who either do not play at all or play more than once
-                foreach (Player player in _context.Players)
+                foreach (Player player in players)
                 {
                     if (player.Id == roundMatchup.PlayerOne.Id)
                     {
-                        playerRoundCount[player.Name] += 1;
+                        playerRoundCount[player] += 1;
                     }
-                    if (player.Id == roundMatchup.PlayerTwo.Id)
+                    //Only check playerTwo if they are not null (Will be null in a bye round)
+                    if (roundMatchup.PlayerTwo != null)
                     {
-                        playerRoundCount[player.Name] += 1;
+                        //Increment the amount of matchups player two has been a part of if they are not the same player as player one
+                        if (player.Id == roundMatchup.PlayerTwo.Id && roundMatchup.PlayerOne != roundMatchup.PlayerTwo)
+                        {
+                            playerRoundCount[player] += 1;
+                        }
                     }
                     if (roundMatchup is PairRoundMatchup)
                     {
                         PairRoundMatchup pairRoundMatchup = roundMatchup as PairRoundMatchup;
-                        if (player.Id == pairRoundMatchup.PlayerThree.Id)
+                        //Only check playerThree and playerFour if they are not null (Will be null in a bye round)
+                        if (pairRoundMatchup.PlayerThree != null && pairRoundMatchup.PlayerFour != null)
                         {
-                            playerRoundCount[player.Name] += 1;
-                        }
-                        if (player.Id == pairRoundMatchup.PlayerFour.Id)
-                        {
-                            playerRoundCount[player.Name] += 1;
+                            //Increment the amount of matchups player three has played of if they are not the same player as player one or two
+                            if (player.Id == pairRoundMatchup.PlayerThree.Id && pairRoundMatchup.PlayerThree != pairRoundMatchup.PlayerTwo && pairRoundMatchup.PlayerThree != pairRoundMatchup.PlayerOne)
+                            {
+                                playerRoundCount[player] += 1;
+                            }
+                            //Increment the amount of matchups player four has played if they are not the same player as player one, two or three
+                            if (player.Id == pairRoundMatchup.PlayerFour.Id && pairRoundMatchup.PlayerFour != pairRoundMatchup.PlayerThree && pairRoundMatchup.PlayerFour != pairRoundMatchup.PlayerTwo && pairRoundMatchup.PlayerFour != pairRoundMatchup.PlayerOne)
+                            {
+                                playerRoundCount[player] += 1;
+                            }
                         }
                     }
                 }
             }
 
+            //Is set up so that if a player is allocated to themselves playerRoundCount is only incremented once. 
+            //It will warn that a player has not played enough rounds, even if they are versing themself in a round. 
+            //It will not warn that a player has played too many rounds if they have been allocated one too many times but
+            //are versing themself in a round.
+
             int roundCount = GetLastRoundNo(_context);
-            foreach (KeyValuePair<string, int> entry in playerRoundCount)
+            foreach (KeyValuePair<Player, int> entry in playerRoundCount)
             {
                 if (entry.Value > roundCount)
                 {
-                    overallocatedPlayers.Add(entry.Key + " has been allocated to " + entry.Value + " matchups with only " + roundCount + " rounds played");
+                    overallocatedPlayers.Add(entry.Key.Name + " has been allocated " + entry.Value + " times with only " + roundCount + " rounds played");
                 }
-                if (entry.Value < roundCount) { unallocatedPlayers.Add(entry.Key + " has only been allocated to " + entry.Value + " matchup/s when " + roundCount + " have been played"); }
+                if (entry.Value < roundCount)
+                {
+                    unallocatedPlayers.Add(entry.Key.Name + " has only been allocated to " + entry.Value + " matchup/s when " + roundCount + " have been played");
+                }
             }
 
-            Dictionary<Player, List<string>> duplicateOpponentsDictionary = new Dictionary<Player, List<string>>();
-            foreach (Player player in players)
-            {
-                List<Player> opponents = PlayerActions.GetAllOpponents(player, _context);
-                List<string> duplicateNames = opponents
-                    .GroupBy(i => i)
-                    .Where(g => g.Count() > 1)
-                    .Select(g => g.Key.Name)
-                    .ToList();
-                duplicateOpponentsDictionary[player] = duplicateNames;
-            }
-
+            Dictionary<Player, List<Player>> duplicateOpponentsDictionary = PlayerActions.GetPreviouslyPlayedOpponentClashes(_context);
             foreach (var duplicateOpponentSet in duplicateOpponentsDictionary)
             {
-                string duplicateOpponentFormattedNameList = string.Join(", ", duplicateOpponentSet.Value);
+                List<string> duplicateOpponentNameList = new List<string>(); 
+                foreach (Player duplicateOpponent in duplicateOpponentSet.Value)
+                {
+                    duplicateOpponentNameList.Add(duplicateOpponent.Name);
+                }
+                string duplicateOpponentFormattedNameList = string.Join(", ", duplicateOpponentNameList);
                 if (duplicateOpponentSet.Value.Count != 0) { duplicateOpponents.Add(duplicateOpponentSet.Key.Name + " has played " + duplicateOpponentFormattedNameList + " at least twice");  }
             }
 
@@ -420,8 +652,6 @@ namespace TableTop2017CoreWeb.Helpers
 
             return (errors);
         }
-
-
         //Returns a table to be assigned to a matchup. Also keeps a record of allocated tables for round. 
         public static int AllocateTable(List<int> tables, List<int> allocated, TournamentDbContext _context)
         {
@@ -498,7 +728,7 @@ namespace TableTop2017CoreWeb.Helpers
         {
             if (_context.RoundsModel.Count() > 0)
             {
-                
+
                 return _context.RoundsModel.Last().NoTableTops;
             }
 
@@ -547,3 +777,40 @@ namespace TableTop2017CoreWeb.Helpers
         }
     }
 }
+
+//No longer needed due to on submission validation of any duplication
+//if (roundMatchup.PlayerTwo != null)
+//                {
+//                    if (roundMatchup is PairRoundMatchup)
+//                    {
+//                        var pairRoundMatchup = roundMatchup as PairRoundMatchup;
+//                        // Check if PlayerOne is on a team with themself
+//                        if (pairRoundMatchup.PlayerOne == pairRoundMatchup.PlayerTwo)
+//                        {
+//                            duplicatePlayers.Add(pairRoundMatchup.PlayerOne.Name + " is on a team with themself in round " + pairRoundMatchup.RoundNo);
+//                        }
+//                        // Check if PlayerOne is playing themself
+//                        if (pairRoundMatchup.PlayerOne == pairRoundMatchup.PlayerThree || pairRoundMatchup.PlayerOne == pairRoundMatchup.PlayerFour)
+//                        {
+//                            duplicatePlayers.Add(pairRoundMatchup.PlayerOne.Name + " is playing themself in round " + pairRoundMatchup.RoundNo);
+//                        }
+//                        //Check if PlayerTwo is playing themself
+//                        if (pairRoundMatchup.PlayerTwo == pairRoundMatchup.PlayerThree || pairRoundMatchup.PlayerTwo == pairRoundMatchup.PlayerFour)
+//                        {
+//                            duplicatePlayers.Add(pairRoundMatchup.PlayerTwo.Name + " is playing themself in round " + pairRoundMatchup.RoundNo);
+//                        }
+//                        //Check if PlayerThree is on a team with themself
+//                        if (pairRoundMatchup.PlayerThree == pairRoundMatchup.PlayerFour)
+//                        {
+//                            duplicatePlayers.Add(pairRoundMatchup.PlayerThree.Name + " is on a team with themself in round " + pairRoundMatchup.RoundNo);
+//                        }
+//                    }
+//                    //Check if there are any players versing themselves
+//                    else if (!(roundMatchup is PairRoundMatchup))
+//                    {
+//                        if (roundMatchup.PlayerOne == roundMatchup.PlayerTwo)
+//                        {
+//                            duplicatePlayers.Add(roundMatchup.PlayerOne.Name + " is playing themself in round " + roundMatchup.RoundNo);
+//                        }
+//                    }
+//                }

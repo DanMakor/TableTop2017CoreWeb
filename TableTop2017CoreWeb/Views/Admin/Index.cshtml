@@ -1,56 +1,57 @@
-﻿@model TableTop2017CoreWeb.Models.AdminViewModel
+﻿@model IEnumerable<TableTop2017CoreWeb.Models.RoundMatchup>
 
 @{
     ViewData["Title"] = "Matchups";
 }
 
-<h2>Admin</h2>
+<h2>Admin - Round @Model.FirstOrDefault().RoundNo</h2>
+<h4 class="alert-warning">@ViewData["Errors"]</h4>
 
-@*<form asp-action="Admin">
-        <label asp-for="CurrentRound"></label>
-        <select id="round-number" asp-for="CurrentRound">
-            <option value="all" selected="@(Model.CurrentRound == "all")">All</option>
-            @foreach (int roundNo in Model.NoOfRounds)
-            {
-                <option value="@roundNo" selected="@(roundNo.ToString() == Model.CurrentRound)">@roundNo</option>
-            }
-        </select>
-        <span asp-validation-for="CurrentRound" class="text-danger"></span>
-        <div class="form-group">
-            <input type="submit" value="Save" class="btn btn-default" />
-        </div
-    </form>*@
-
-@{ var first = Model.RoundMatchup.FirstOrDefault(); }
-@if (first is PairRoundMatchup)
-{
     <table class="table">
-        @Html.Partial("_PairRoundMatchupTableHead", first as PairRoundMatchup)
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.PlayerOne.SportsmanshipScore)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PlayerOne.BattleScore)
+                </th>
+                <th>
+                    Team One
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Table)
+                </th>
+                <th>
+                    Team Two
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PlayerTwo.BattleScore)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PlayerTwo.SportsmanshipScore)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
         <tbody>
-            @foreach (PairRoundMatchup pairRoundMatchup in Model.RoundMatchup)
+        @foreach (var item in Model)
+        {
+            @if (item is PairRoundMatchup)
             {
-                @Html.Partial("_PairRoundMatchupTableBodyItem", pairRoundMatchup);
+                @Html.Partial("_PairRoundMatchupTableBodyItem", item as PairRoundMatchup)
             }
-        </tbody>
-    </table>
-}
-else if (first is RoundMatchup)
-{
-    <table class="table">
-        @Html.Partial("_RoundMatchupTableHead", first)
-        <tbody>
-            @foreach (RoundMatchup roundMatchup in Model.RoundMatchup)
+            else if (item is RoundMatchup)
             {
-                @Html.Partial("_RoundMatchupTableBodyItem", roundMatchup);
-            }
-        </tbody>
+                @Html.Partial("_RoundMatchupTableBodyItem", item)
+            }                
+        }
+    </tbody>
     </table>
-}
-
 
 
 @Html.ActionLink("Confirm Matchups", "", "RoundMatchups", null, new { @class = "btn btn-primary" })
-@Html.ActionLink("Validate Matchups", "ValidateRoundMatchups", "Admin", first.RoundNo, new { @class = "btn btn-primary" })
+@Html.ActionLink("Validate Matchups", "ValidateRoundMatchups", "Admin", Model.FirstOrDefault().RoundNo, new { @class = "btn btn-primary" })
 @Html.ActionLink("Reset Matchups", "ResetRoundMatchups", "Admin", null, new { @class = "btn btn-primary" })
 
 @if(ViewData["DuplicatePlayers"] != null || ViewData["DuplicateOpponents"] != null || ViewData["OverallocatedPlayers"] != null || ViewData["UnallocatedPlayers"] != null)
@@ -61,20 +62,8 @@ else if (first is RoundMatchup)
 }
 
 <div class="mt-xs">
-    @if (ViewData["DuplicatePlayers"] != null)
-    {
         <p class="text-danger">@ViewData["DuplicatePlayers"]</p>
-    }
-    @if (ViewData["DuplicateOpponents"] != null)
-    {
         <p class="text-danger">@ViewData["DuplicateOpponents"]</p>
-    }
-    @if (ViewData["OverallocatedPlayers"] != null)
-    {
         <p class="text-danger">@ViewData["OverallocatedPlayers"]</p>
-    }
-    @if (ViewData["UnallocatedPlayers"] != null)
-    {
         <p class="text-danger">@ViewData["UnallocatedPlayers"]</p>
-    }
 </div>

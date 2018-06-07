@@ -15,14 +15,14 @@ namespace TableTop2017CoreWeb.Data
         public DbSet<RoundsModel> RoundsModel { get; set; }
         public DbSet<Player> Players { get; set; }
         public DbSet<RoundMatchup> RoundMatchups { get; set; }
-        public DbSet<PairRoundMatchup> PairRoundMatchup { get; set; }
+        public DbSet<PairRoundMatchup> PairRoundMatchups { get; set; }
+        public DbSet<Tournament> Tournaments { get; set; }
     }
 }
 
 public static class EntityExtensions
 {
     public static void Clear<T>(this DbSet<T> dbSet) where T : class
-    {
-        dbSet.RemoveRange(dbSet);
+    {        dbSet.RemoveRange(dbSet);
     }
 }

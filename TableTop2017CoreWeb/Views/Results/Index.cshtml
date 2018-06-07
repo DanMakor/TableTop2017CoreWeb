@@ -1,0 +1,53 @@
+﻿@model IEnumerable<TableTop2017CoreWeb.Models.RoundMatchup>
+
+@{
+    ViewData["Title"] = "Results";
+    var first = Model.FirstOrDefault();
+}
+
+
+<h2 class="text-secondary">Results - Round @first.RoundNo</h2>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerOneSportsmanshipScore)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerOneBattleScore)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerOne.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Table)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerOne.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerTwoBattleScore)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerTwoSportsmanshipScore)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            @if (item is PairRoundMatchup)
+            {
+                @Html.Partial("_ResultsPairRoundMatchupTableBodyItem", item as PairRoundMatchup)
+            }
+            else if (item is RoundMatchup)
+            {
+                @Html.Partial("_ResultsRoundMatchupTableBodyItem", item)
+            }
+        }
+    </tbody>
+</table>
+
+@Html.ActionLink("Confirm Scores", "ConfirmScoreInputs", "Results", null, new { @class = "btn btn-primary" })

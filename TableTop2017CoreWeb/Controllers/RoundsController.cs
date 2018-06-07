@@ -23,20 +23,42 @@ namespace TableTop2017CoreWeb.Controllers
 
         public async Task<IActionResult> Index()
         {
+
             return View(await _context.RoundsModel.ToListAsync());
         }
-
-       /* public async Task<int> GetLastRound(TournamentDbContext _context)
+        // GET: Players/Edit/5
+        public async Task<IActionResult> Edit(int? id)
         {
-            int currentRound = 1;
-            Rounds lastRound = await _context.Rounds.LastOrDefaultAsync();
-            if (lastRound != null)
+            if (id == null)
             {
-                currentRound = lastRound.RoundNo;
+                return NotFound();
             }
-            return currentRound;
+
+            var player = await _context.Players.SingleOrDefaultAsync(m => m.Id == id);
+            if (player == null)
+            {
+                return NotFound();
+            }
+            return RedirectToAction("Edit","Players", player);
         }
-        */
+        // GET: Players/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var player = await _context.Players
+                .SingleOrDefaultAsync(m => m.Id == id);
+            if (player == null)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction("Delete", "Players", player);
+        }
+
         private bool RoundsModelExists(int id)
         {
             return _context.RoundsModel.Any(e => e.Id == id);
@@ -54,7 +76,7 @@ namespace TableTop2017CoreWeb.Controllers
                     {
                         _context.Add(Round);
                         await _context.SaveChangesAsync();
-                        return RedirectToAction("DisplayNextRound", "Admin");
+                        return RedirectToAction("DisplayNextRound", "RoundMatchups");
                     }
                     break;
                 case "GoToDisplayNextPairRound":
@@ -63,7 +85,7 @@ namespace TableTop2017CoreWeb.Controllers
                     {
                         _context.Add(Round);
                         await _context.SaveChangesAsync();
-                        return RedirectToAction("DisplayNextPairRound", "Admin");
+                        return RedirectToAction("DisplayNextPairRound", "RoundMatchups");
                     }
                     break;
                 default:
@@ -91,7 +113,7 @@ namespace TableTop2017CoreWeb.Controllers
             {
                 _context.Add(Round);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("DisplayNextRound", "Admin");
+                return RedirectToAction("DisplayNextRound", "RoundMatchups");
             }
 
             return View(Round);
@@ -116,7 +138,7 @@ namespace TableTop2017CoreWeb.Controllers
             {
                 _context.Add(Round);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("DisplayNextPairRound", "Admin");
+                return RedirectToAction("DisplayNextPairRound", "RoundMatchups");
             }
 
             return View(Round);
@@ -125,10 +147,17 @@ namespace TableTop2017CoreWeb.Controllers
      
         public async Task<IActionResult> PlayersDisplay()
         {
-
+            List<Player> players = await _context.Players.ToListAsync();
+            ViewData["Errors"] = TempData["Errors"];
+            Tournament tournament = _context.Tournaments.First();
+            foreach (Player player in players)
+            {
+                player.WeightedScore = ((int)(player.BattleScore * tournament.BattleScoreRatio) + (int)(player.SportsmanshipScore * tournament.SportsmanshipScoreRatio) + (int)(player.ArmyScore * tournament.ArmyScoreRatio));
+            }
+            players = players.OrderByDescending(p => p.WeightedScore).ToList();
+            //  return View(players);
             var display = new RoundsModel();
-
-            List<Player> players = await _context.Players.OrderByDescending(p => p.BattleScore).ToListAsync();
+            
             if (_context.RoundsModel.Count() > 0)
                 display.NoTableTops = _context.RoundsModel.Last().NoTableTops;
             display.Players = players;

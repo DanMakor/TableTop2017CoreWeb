@@ -13,6 +13,7 @@ namespace TableTop2017CoreWeb.Models
         public string Name { get; set; }
         public string Army { get; set; }
         public Boolean Active { get; set; } 
+        public Boolean Bye { get; set; }
         [DisplayName("Email Address")]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string EmailAddress { get; set; }
@@ -22,11 +23,16 @@ namespace TableTop2017CoreWeb.Models
         public int BattleScore { get; set; } 
         [DisplayName("Sports Score")]
         public int SportsmanshipScore { get; set; }
+        [DisplayName("Army Score")]
+        public int ArmyScore { get; set; }
+        [DisplayName("Weighted Score")]
+        public int WeightedScore { get; set; }
         public Player CurrentOpponent { get; set; }
 
         public Player()
         {
             Active = true;
+            Bye = false;
             BattleScore = 0;
             SportsmanshipScore = 0;
         }

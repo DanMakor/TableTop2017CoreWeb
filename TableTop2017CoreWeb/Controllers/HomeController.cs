@@ -18,9 +18,9 @@ namespace TableTop2017CoreWeb.Controllers
 
         public IActionResult About()
         {
-            ViewData["Message"] = "Your application description page.";
+            
 
-            return View();
+            return RedirectToAction("Index", "Tournaments");
         }
 
         public IActionResult Contact()

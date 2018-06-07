@@ -28,208 +28,66 @@ namespace TableTop2017CoreWeb.Controllers
 
         public void Database()
         {
-            List<RoundMatchup> roundmatchups = _context.RoundMatchups.ToList();
-            foreach(RoundMatchup roundmatchup in roundmatchups)
-            {
-                _context.Remove(roundmatchup);
-            }
             List<RoundsModel> rounds = _context.RoundsModel.ToList();
             foreach (RoundsModel round in rounds)
             {
                 _context.Remove(round);
             }
-
+            List<RoundMatchup> roundmatchups = _context.RoundMatchups.ToList();
+            foreach(RoundMatchup roundmatchup in roundmatchups)
+            {
+                _context.Remove(roundmatchup);
+            }
             _context.SaveChanges();
-            SetPlayerBattleScores();
+            foreach (Player player in _context.Players.ToList())
+            {
+                player.BattleScore = 0;
+                player.SportsmanshipScore = 0;
+                player.ArmyScore = 0;
+                _context.SaveChanges();
+            }
+            //PlayerActions.SetAllPlayerScores(_context);
+        }
+
+        public ActionResult DisplayNextRound()
+        {
+            List<Player> activePlayers = _context.Players.Where(p => p.Active == true).Where(p => p.Bye == false).ToList();
+            if ((activePlayers.Count() % 2) != 0)
+            {
+                TempData["Errors"] = "You are attempting to generate a round with an odd number of players, choose the player that should have a bye and retry";
+                return RedirectToAction(nameof(Index), "Players");
+            }
+            if (RoundMatchupActions.GenerateNextRound(_context) == false)
+            {
+                TempData["Errors"] = "There are no unique matchups left, manual selection will be required (Matchups are generated based on most evenly skilled players according to BattleScore, with no regard for previous opponents)";
+            }
+            return RedirectToAction(nameof(Index), "Admin");
+        }
+
+        public ActionResult DisplayNextPairRound()
+        {
+            List<Player> activePlayers = _context.Players.Where(p => p.Active == true).Where(p => p.Bye == false).ToList();
+            if ((activePlayers.Count() % 4) != 0)
+            {
+                TempData["Errors"] = "You are attempting to generate a round with a number of players indivisible by four, choose the players that should have a bye and retry";
+                return RedirectToAction(nameof(Index), "Players");
+            }
+            if (RoundMatchupActions.GenerateNextPairRound(_context) == false)
+            {
+                TempData["Errors"] = "There are no unique matchups left, manual selection will be required (Random Matchups have been allocated where opponents from last round are teammates)";
+            }
+            return RedirectToAction(nameof(Index), "Admin");
         }
 
         // GET: RoundMatchups
         public async Task<IActionResult> Index()
         {
-            int currentRound = RoundMatchupActions.GetLastRoundNo(_context);
-            List<RoundMatchup> roundMatchups = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Where(r => r.RoundNo == currentRound).OrderByDescending(r => r.PlayerOne.BattleScore).ToListAsync();
-            return View(roundMatchups);
+            int lastRoundNo = RoundMatchupActions.GetLastRoundNo(_context);
+            //Get all rounds as list from database and then filter using the where clause (potentially inefficient but no time to sort out lazy loading issue)
+            var roundMatchups = _context.RoundMatchups.Where(r => !(r is PairRoundMatchup)).Where(r => r.RoundNo == lastRoundNo).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).ToList();
+            var pairRoundMatchups = _context.PairRoundMatchups.Where(r => r.RoundNo == lastRoundNo).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Include(r => r.PlayerThree).Include(r => r.PlayerFour).ToList();
+            return View(roundMatchups.Union(pairRoundMatchups));
         }
-
-        // GET: AdminMatchups
-        public async Task<IActionResult> Admin(int? roundNumber)
-        {
-            int? currentRound;
-            string selectedRound;
-            List<RoundMatchup> roundMatchups = new List<RoundMatchup>();
-            var pairRoundMatchups = new List<PairRoundMatchup>();
-            if (roundNumber == 0)
-            {
-                roundMatchups = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).OrderByDescending(r => r.PlayerOne.BattleScore).ToListAsync();
-                selectedRound = "all";
-            }
-            else
-            {
-                if (roundNumber == null)
-                {
-                    currentRound = RoundMatchupActions.GetLastRoundNo(_context);
-                }
-                else
-                {
-                    currentRound = roundNumber;
-                }
-                roundMatchups = await _context.RoundMatchups.Where(r => !(r is PairRoundMatchup)).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Where(r => r.RoundNo == currentRound).ToListAsync();
-                pairRoundMatchups = await _context.PairRoundMatchup.Where(r => r.RoundNo == currentRound).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Include(r => r.PlayerThree).Include(r => r.PlayerFour).ToListAsync();
-                selectedRound = currentRound.ToString();
-            }
-            AdminViewModel avm = new AdminViewModel
-            {
-                RoundMatchup = pairRoundMatchups,
-                NoOfRounds = _context.RoundMatchups.Select(r => r.RoundNo).ToArray(),
-                CurrentRound = selectedRound
-            };
-            if ( avm.RoundMatchup.Count() == 0)
-            {
-                avm.RoundMatchup = roundMatchups;
-            }
-            TempData["DuplicatePlayers"] = null;
-            TempData["OverallocatedPlayers"] = null;
-            TempData["UnallocatedPlayers"] = null;
-
-            return View(avm);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Admin([Bind("CurrentRound")] AdminViewModel avm)
-        {
-            int currentRound;
-
-
-            if (avm.CurrentRound == "all")
-            {
-                currentRound = 0;
-            }
-            else
-            {
-                currentRound = int.Parse(avm.CurrentRound);
-            }
-            return RedirectToAction("Admin", "RoundMatchups", new { roundNumber = currentRound });
-        }
-
-        // GET: RoundMatchups Results
-        public async Task<IActionResult> Results()
-        {
-            int currentRound = RoundMatchupActions.GetLastRoundNo(_context);
-            List<RoundMatchup> roundMatchups = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Where(r => r.RoundNo == currentRound).OrderByDescending(r => r.PlayerOne.BattleScore).ToListAsync();
-            return View(roundMatchups);
-        }
-
-        // GET: Allrounds
-        public async Task<IActionResult> AllRounds()
-        {
-            List<RoundMatchup> roundMatchups = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).ToListAsync();
-            TempData["DuplicateOpponents"] = null;
-            return View(roundMatchups);
-        }
-
-        //GET: AllRoundsEdit
-        public async Task<IActionResult> AllRoundsEdit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            var roundMatchup = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).SingleOrDefaultAsync(m => m.Id == id);
-            return View(roundMatchup);
-        }
-
-        //Update the Player Battlescores before redirecting to the player page
-        public ActionResult UpdateBattleScores()
-        {
-            SetPlayerBattleScores();
-            return RedirectToAction("Index", "Players");
-        }
-        //Update the Player Battlescores before redirecting to the player page
-        public ActionResult UpdateBattleScoresContinue()
-        {
-            SetPlayerBattleScores();
-            if (_context.RoundsModel.LastOrDefault() == null)
-            {
-                return RedirectToAction("PlayersDisplay", "Rounds");
-            }
-            /*RoundsModel newRound = new RoundsModel
-            {
-                //RoundNo= _context.RoundsModel.LastOrDefault().RoundNo +1,
-                NoTableTops = _context.RoundsModel.LastOrDefault().NoTableTops,
-         
-            };
-            if (ModelState.IsValid)
-            {
-                _context.Add(newRound);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("DisplayNextRound", "Admin");
-            }
-            */
-
-            return RedirectToAction("DisplayNextRound", "Admin");
-        }
-
-        //GET: ResultsEdit
-        public async Task<IActionResult> ResultsEdit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var roundMatchup = await _context.RoundMatchups.Include(r => r.PlayerOne).Include(r => r.PlayerTwo).SingleOrDefaultAsync(m => m.Id == id);
-            return View(roundMatchup);
-        }
-
-        //POST: RoundMatchups Results
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResultsEdit(int id, [Bind("Id,RoundNo,PlayerOneId,PlayerTwoId,PlayerOneBattleScore,PlayerTwoBattleScore,PlayerOneSportsmanshipScore,PlayerTwoSportsmanshipScore,Table")] RoundMatchup roundMatchup)
-        {
-            if (id != roundMatchup.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(roundMatchup);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!RoundMatchupActions.RoundMatchupsExists(roundMatchup.Id, _context))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Results));
-            }
-            return View(roundMatchup);
-        }
-
-    public void SetPlayerBattleScores()
-    {
-        Dictionary<Player, int> playerBattleScores = PlayerActions.GetAllPlayerBattleScores(_context);
-        foreach (KeyValuePair<Player, int> playerBattleScore in playerBattleScores)
-        {
-            playerBattleScore.Key.BattleScore = playerBattleScore.Value;
-            _context.Update(playerBattleScore.Key);
-        }
-        if (ModelState.IsValid)
-        {
-            _context.SaveChanges();
-        }
-    }
-
 
         //Generate the RoundMatchups 
         public ActionResult GenerateRoundMatchups()
@@ -323,7 +181,7 @@ namespace TableTop2017CoreWeb.Controllers
         public int AllocateTable(List<int> tables, List<int> allocated)
         {
             var isAvailable = true;
-
+            
             foreach (int tableNo in tables)
             {
                 isAvailable = true;
@@ -332,7 +190,7 @@ namespace TableTop2017CoreWeb.Controllers
 
                     if (allocated[i] == tableNo)
                     {
-
+                        Debug.WriteLine("THIS IS THE ALLOCATED[i]----))*  \n" + allocated[i]);
                         isAvailable = false;
                     }
                 }
@@ -341,59 +199,18 @@ namespace TableTop2017CoreWeb.Controllers
                     allocated.Add(tableNo);
                     return tableNo;
                 }
-
+              
             }
-            //if unble to allocate a table that has not been played on then a random table will be assigned
-            if (allocated.Count > 0)
-            {
-
-                // Debug.WriteLine("THIS IS THE ALLOCATED.Count----))*  \n" + allocated.Count);
-
-
-                for (int i = 1; i <= GetnoOfTables(); i++)
-                {
-                    isAvailable = true;
-                    foreach (int table in allocated)
-                    {
-
-                        if (i == table)
-                        {
-
-                            isAvailable = false;
-                        }
-                    }
-                    if (isAvailable == true)
-                    {
-                        allocated.Add(i);
-                        return i;
-                    }
-                }
-
-
-
-            }
-            else
-            {
-                Random r = new Random();
-                int i = r.Next(1, GetnoOfTables());
-                allocated.Add(i);
-                return i;
-            }
-
             //At the moment this is just to return a number when there are no more possible combinations for players and tables
             return 999;
-
+            
         }
         public int GetnoOfTables()
         {
-            if (_context.RoundsModel.Count() > 0)
-            {
-                RoundsModel NoOfTa = _context.RoundsModel.Last();
-                return NoOfTa.NoTableTops;
-            }
+            
+            // var TableNumber = object.getElementById("noOfTables");
 
-
-            return 12;
+            return 5;
         }
         //returns a list of available tables that the player has not played on
         public List<int> GetTables(Player currentPlayer)
@@ -401,47 +218,38 @@ namespace TableTop2017CoreWeb.Controllers
 
             // List<int> tables = _context.RoundMatchups.Where(a => a.PlayerOne == currentPlayer || a.PlayerOne.CurrentOpponent == currentPlayer).Select(a => a.Table).ToList();
             List<int> tables = new List<int>();
-            List<RoundMatchup> roundMatchups = _context.RoundMatchups.ToList();
+            List <RoundMatchup> roundMatchups = _context.RoundMatchups.ToList();
             int currentRound = 1;
             if (_context.RoundMatchups.LastOrDefault() != null)
             {
-                currentRound = _context.RoundMatchups.Last().RoundNo + 1;
+                currentRound = _context.RoundMatchups.Last().RoundNo+1;
             }
-
-            //adds all tables to list
-            for (int j = 1; j <= GetnoOfTables(); j++)
-            {
-                tables.Add(j);
-            }
+            
+                //adds all tables to list
+                for (int j = 1; j <= GetnoOfTables(); j++)
+                {
+                    tables.Add(j);
+                }
             if (currentRound < 2)
                 return tables;
             else
             {
                 //List<int> temp = _context.RoundMatchups.Where(a => a.PlayerOne == currentPlayer || a.PlayerTwo == currentPlayer).Select(a => a.Table).ToList();
-                // tables = (List<int>)tables.Except(temp); // returns all the firms except those in _context.RoundMatchups.Where(Ect..)
+               // tables = (List<int>)tables.Except(temp); // returns all the firms except those in _context.RoundMatchups.Where(Ect..)
                 //*
                 foreach (var roundMatchup in roundMatchups)
                 {
-                    if (roundMatchup.PlayerOne == currentPlayer || roundMatchup.PlayerTwo == currentPlayer || currentPlayer.CurrentOpponent == roundMatchup.PlayerOne || currentPlayer.CurrentOpponent == roundMatchup.PlayerTwo)
+                    if (roundMatchup.PlayerOne == currentPlayer || roundMatchup.PlayerTwo == currentPlayer || currentPlayer.CurrentOpponent ==roundMatchup.PlayerOne || currentPlayer.CurrentOpponent == roundMatchup.PlayerTwo)
                     {
                         tables.Remove(roundMatchup.Table);
                     }
                 }
                 //*/
-
+               
             }
-
-
-
+            
             //Where(r => r.roundNo == currentRound);
             return tables;
         }
-
-        //public ActionResult ValidateAllMatchups()
-        //{
-        //    TempData["DuplicateOpponents"] = ValidateMatchupOpponents();
-        //    return View("AllRounds", _context.RoundMatchups.ToList());
-        //}
-
     } 
 }
