@@ -12,7 +12,9 @@ namespace TableTop2017CoreWeb.Data
         public TournamentDbContext(DbContextOptions<TournamentDbContext> options) : base(options) {
 
         }
-        public DbSet<Round> Rounds { get; set; }
+
+        public DbSet<RoundsModel> RoundsModel { get; set; }
+
         public DbSet<Player> Players { get; set; }
         public DbSet<RoundMatchup> RoundMatchups { get; set; }
         public DbSet<PairRoundMatchup> PairRoundMatchups { get; set; }
@@ -23,7 +25,6 @@ namespace TableTop2017CoreWeb.Data
 public static class EntityExtensions
 {
     public static void Clear<T>(this DbSet<T> dbSet) where T : class
-    {
-        dbSet.RemoveRange(dbSet);
+    {        dbSet.RemoveRange(dbSet);
     }
 }

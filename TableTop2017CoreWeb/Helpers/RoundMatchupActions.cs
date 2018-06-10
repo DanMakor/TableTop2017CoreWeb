@@ -35,7 +35,9 @@ namespace TableTop2017CoreWeb.Helpers
         public static Boolean GenerateNextRound(TournamentDbContext _context)
         {
             List<Player> players = _context.Players.Where(p => p.Active && p.Bye == false && p.Name != "Bye").OrderByDescending(p => p.BattleScore).ToList();
-            //List<int> AllocatedTables = new List<int>(GetnoOfTables());
+
+            List<int> AllocatedTables = new List<int>(GetNoOfTables(_context));
+
             Boolean error = false;
             int secondaryIndex = 0;
             int i = 0;
@@ -155,7 +157,9 @@ namespace TableTop2017CoreWeb.Helpers
                     };
 
                     //allocates table for matchup
-                    // roundMatchup.Table = AllocateTable(GetTables(player), AllocatedTables);
+
+                    roundMatchup.Table = AllocateTable(GetTables(player, _context), AllocatedTables, _context);
+
                     _context.Add(roundMatchup);
                 }
                 //If there are no more unique matchups
@@ -173,6 +177,10 @@ namespace TableTop2017CoreWeb.Helpers
                             PlayerOne = player,
                             PlayerTwo = player.CurrentOpponent
                         };
+
+
+                        roundMatchup.Table = AllocateTable(GetTables(player, _context), AllocatedTables, _context);
+
                         _context.Add(roundMatchup);
                     }
                 }
@@ -650,6 +658,131 @@ namespace TableTop2017CoreWeb.Helpers
 
             return (errors);
         }
+
+        //Returns a table to be assigned to a matchup. Also keeps a record of allocated tables for round. 
+        public static int AllocateTable(List<int> tables, List<int> allocated, TournamentDbContext _context)
+        {
+            var isAvailable = true;
+
+            foreach (int tableNo in tables)
+            {
+                isAvailable = true;
+                for (int i = 0; i < allocated.Count; i++)
+                {
+
+                    if (allocated[i] == tableNo)
+                    {
+
+                        isAvailable = false;
+                    }
+                }
+                if (isAvailable == true)
+                {
+                    allocated.Add(tableNo);
+                    return tableNo;
+                }
+
+            }
+            //if unble to allocate a table that has not been played on then a random table will be assigned
+            if (allocated.Count > 0)
+            {
+
+                // Debug.WriteLine("THIS IS THE ALLOCATED.Count----))*  \n" + allocated.Count);
+
+
+                for (int i = 1; i <= GetNoOfTables(_context); i++)
+                {
+                    isAvailable = true;
+                    foreach (int table in allocated)
+                    {
+
+                        if (i == table)
+                        {
+
+                            isAvailable = false;
+                        }
+                    }
+                    if (isAvailable == true)
+                    {
+                        allocated.Add(i);
+                        return i;
+                    }
+                }
+
+
+
+            }
+            else
+            {
+
+                Random r = new Random();
+                int randomTable = r.Next(1, 12);
+                int NumOfTables = GetNoOfTables(_context);
+                if (NumOfTables >= 1)
+                {
+                    randomTable = r.Next(1, NumOfTables);
+                }
+                allocated.Add(randomTable);
+                return randomTable;
+
+            }
+
+            //At the moment this is just to return a number when there are no more possible combinations for players and tables
+            return 999;
+
+        }
+        public static int GetNoOfTables(TournamentDbContext _context)
+        {
+            if (_context.RoundsModel.Count() > 0)
+            {
+
+                return _context.RoundsModel.Last().NoTableTops;
+            }
+
+
+            return 0;
+        }
+        //returns a list of available tables that the player has not played on
+        public static List<int> GetTables(Player currentPlayer, TournamentDbContext _context)
+        {
+
+            // List<int> tables = _context.RoundMatchups.Where(a => a.PlayerOne == currentPlayer || a.PlayerOne.CurrentOpponent == currentPlayer).Select(a => a.Table).ToList();
+            List<int> tables = new List<int>();
+            List<RoundMatchup> roundMatchups = _context.RoundMatchups.ToList();
+            int currentRound = 1;
+            if (_context.RoundMatchups.LastOrDefault() != null)
+            {
+                currentRound = _context.RoundMatchups.Last().RoundNo + 1;
+            }
+            //adds all tables to list
+            for (int j = 1; j <= GetNoOfTables(_context); j++)
+            {
+                tables.Add(j);
+            }
+            if (currentRound < 2)
+                return tables;
+            else
+            {
+                //List<int> temp = _context.RoundMatchups.Where(a => a.PlayerOne == currentPlayer || a.PlayerTwo == currentPlayer).Select(a => a.Table).ToList();
+                // tables = (List<int>)tables.Except(temp); // returns all the firms except those in _context.RoundMatchups.Where(Ect..)
+                //*
+                foreach (var roundMatchup in roundMatchups)
+                {
+                    if (roundMatchup.PlayerOne == currentPlayer || roundMatchup.PlayerTwo == currentPlayer || currentPlayer.CurrentOpponent == roundMatchup.PlayerOne || currentPlayer.CurrentOpponent == roundMatchup.PlayerTwo)
+                    {
+                        tables.Remove(roundMatchup.Table);
+                    }
+                }
+                //*/
+
+            }
+
+
+
+            //Where(r => r.roundNo == currentRound);
+            return tables;
+        }
+
     }
 }
 

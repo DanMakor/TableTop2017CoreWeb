@@ -19,8 +19,44 @@ namespace TableTop2017CoreWeb.Controllers
             _context = context;
         }
 
+
+        // GET: Tournaments
+        public async Task<IActionResult> Index()
+        {
+            return View(await _context.Tournaments.ToListAsync());
+        }
+
+        // GET: Tournaments/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: Tournaments/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Id,BattleScoreRatio,SportsmanshipScoreRatio,ArmyScoreRatio")] Tournament tournament)
+        {
+            if (tournament.BattleScoreRatio + tournament.SportsmanshipScoreRatio + tournament.ArmyScoreRatio != 1)
+            {
+                TempData["Errors"] = "The score ratios must add up to a total of 1";
+                return View(tournament);
+            }
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(tournament);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(tournament);
+        }
+
         //Single tournament is seeded into the database upon application startup
         //The logic for this can be found in Initialize.cs and Program.cs
+
 
         // GET: Tournaments/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -78,6 +114,37 @@ namespace TableTop2017CoreWeb.Controllers
             }
             return View(tournament);
         }
+
+
+        // GET: Tournaments/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var tournament = await _context.Tournaments
+                .SingleOrDefaultAsync(m => m.Id == id);
+            if (tournament == null)
+            {
+                return NotFound();
+            }
+
+            return View(tournament);
+        }
+
+        // POST: Tournaments/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var tournament = await _context.Tournaments.SingleOrDefaultAsync(m => m.Id == id);
+            _context.Tournaments.Remove(tournament);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
 
         private bool TournamentExists(int id)
         {

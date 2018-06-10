@@ -17,10 +17,12 @@ namespace TableTop2017CoreWeb.Models
         public double PlayerThreeId { get; set; }
         [DisplayName("Player Four")]
         public double PlayerFourId { get; set; }
+        public int TableNo { get; set; }
+
+        //Used just in case a player record has the default int value of 0 ruining existence checking
         public List<Player> Players { get; set; }
 
 
-        //Used just in case a player record has the default int value of 0 ruining existence checking for pair round
         public AdminEditRoundMatchupsViewModel()
         {
             PlayerOneId = 0.5;
