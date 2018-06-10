@@ -25,6 +25,7 @@ namespace TableTop2017CoreWeb.Controllers
             List<Player> players = await _context.Players.ToListAsync();
             ViewData["Errors"] = TempData["Errors"];
             Tournament tournament = _context.Tournaments.First();
+
             ViewData["TournamentId"] = tournament.Id;
 
             foreach (Player player in players)
@@ -32,7 +33,10 @@ namespace TableTop2017CoreWeb.Controllers
                 player.WeightedScore = ((int)(player.BattleScore * tournament.BattleScoreRatio) + (int)(player.SportsmanshipScore * tournament.SportsmanshipScoreRatio) + (int)(player.ArmyScore * tournament.ArmyScoreRatio));
             }
             players = players.OrderByDescending(p => p.WeightedScore).ToList();
-            return View(players);
+
+          //  return View(players);
+            return RedirectToAction("PlayersDisplay", "Rounds", players);
+
         }
 
         // GET: Players/Details/5

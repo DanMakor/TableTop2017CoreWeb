@@ -1,0 +1,30 @@
+﻿@model TableTop2017CoreWeb.Models.RoundsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>RoundsModel</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.RoundNo)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.RoundNo)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.NoTableTops)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.NoTableTops)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
