@@ -1,4 +1,4 @@
-﻿@model TableTop2017CoreWeb.Models.RoundMatchup
+﻿@model TableTop2017CoreWeb.Models.RoundMatchupEditViewModel
 
 @{
     ViewData["Title"] = "ResultsEdit";
@@ -10,31 +10,33 @@
 <hr />
 <div class="row">
     <div class="col-md-12">
-        <form asp-action="ResultsEdit">
+        <form asp-action="RoundMatchupEdit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="RoundNo" />
             <input type="hidden" asp-for="Table" />
+            <input type="hidden" asp-for="PlayerOneId" />
+            <input type="hidden" asp-for="PlayerTwoId" />
             <table class="table">
                 <thead>
                     <tr>
                         <th>
-                            <span>@Html.DisplayFor(model => model.PlayerOne.Name) </span><label asp-for="PlayerOneSportsmanshipScore" class="control-label"></label>
+                            <span>@Html.DisplayFor(model => model.PlayerOneName) </span><label asp-for="PlayerOneSportsmanshipScore" class="control-label"></label>
                         </th>
                         <th>
-                            <span>@Html.DisplayFor(model => model.PlayerOne.Name) </span><label asp-for="PlayerOneBattleScore" class="control-label"></label>
+                            <span>@Html.DisplayFor(model => model.PlayerOneName) </span><label asp-for="PlayerOneBattleScore" class="control-label"></label>
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.PlayerOne.Name)
+                            @Html.DisplayNameFor(model => model.PlayerOneName)
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.PlayerTwo.Name)
+                            @Html.DisplayNameFor(model => model.PlayerTwoName)
                         </th>
                         <th>
-                            <span>@Html.DisplayFor(model => model.PlayerTwo.Name) </span><label asp-for="PlayerTwoBattleScore" class="control-label"></label>
+                            <span>@Html.DisplayFor(model => model.PlayerTwoName) </span><label asp-for="PlayerTwoBattleScore" class="control-label"></label>
                         </th>
                         <th>
-                            <span>@Html.DisplayFor(model => model.PlayerTwo.Name) </span><label asp-for="PlayerTwoSportsmanshipScore" class="control-label"></label>
+                            <span>@Html.DisplayFor(model => model.PlayerTwoName) </span><label asp-for="PlayerTwoSportsmanshipScore" class="control-label"></label>
                         </th>
                     </tr>
                 </thead>
@@ -49,10 +51,10 @@
                             <span asp-validation-for="PlayerOneBattleScore" class="text-danger"></span>
                         </td>
                         <th>
-                            @Html.DisplayFor(model => model.PlayerOne.Name)
+                            @Html.DisplayFor(model => model.PlayerOneName)
                         </th>
                         <th>
-                            @Html.DisplayFor(model => model.PlayerTwo.Name)
+                            @Html.DisplayFor(model => model.PlayerTwoName)
                         </th>
                         <td class="form-group">
                             <input asp-for="PlayerTwoBattleScore" class="form-control" />
@@ -66,13 +68,13 @@
                             <input type="submit" value="Save" class="btn btn-default" />
                         </td>
                     </tr>
-                </tbody> 
+                </tbody>
             </table>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Results">Back to List</a>
+    <a asp-action="Index">Back to List</a>
 </div>
 

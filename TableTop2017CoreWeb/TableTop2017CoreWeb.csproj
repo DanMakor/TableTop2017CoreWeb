@@ -27,6 +27,10 @@
     <Compile Remove="Migrations\20180503132654_PlayerTeammateOppRelationship.Designer.cs" />
     <Compile Remove="Migrations\20180503141104_PendingChanges.cs" />
     <Compile Remove="Migrations\20180503141104_PendingChanges.Designer.cs" />
+    <Compile Remove="Migrations\20180511014107_ArmyScoreAndTournamentModel.cs" />
+    <Compile Remove="Migrations\20180511014107_ArmyScoreAndTournamentModel.Designer.cs" />
+    <Compile Remove="Migrations\20180511014301_ArmyScoreAndTournamentModel.cs" />
+    <Compile Remove="Migrations\20180511014301_ArmyScoreAndTournamentModel.Designer.cs" />
   </ItemGroup>
 
 
@@ -46,10 +50,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="tournament.db" />
-    <None Remove="tournament.db-journal" />
+    <Folder Include="Views\Shared\Editor Template\" />
   </ItemGroup>
 </Project>

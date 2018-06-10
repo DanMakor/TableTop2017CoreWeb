@@ -2,73 +2,50 @@
 
 @{
     ViewData["Title"] = "Index";
+    var first = Model.FirstOrDefault();
 }
 
-<h2>Index</h2>
+<h2 class="text-secondary">Round Matchups - Round @first.RoundNo</h2>
 
-<div class="row">
-    <div class="col-md-10">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>
-                        @Html.DisplayNameFor(model => model.RoundNo)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.PlayerOne.Army)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.PlayerOne.Name)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Table)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.PlayerTwo.Name)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.PlayerTwo.Army)
-                    </th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.RoundNo)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.PlayerOne.Army)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.PlayerOne.Name)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Table)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.PlayerTwo.Name)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.PlayerTwo.Army)
-                        </td>
-                        <td>
-                            <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                            <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerOne.Army)
+            </th>
+            <th>
+                Team One
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Table)
+            </th>
+            <th>
+                Team Two
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerTwo.Army)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            @if (item is PairRoundMatchup)
+            {
+                @Html.Partial("_PairRoundMatchupTableBodyItem", item as PairRoundMatchup)
+            }
+            else if (item is RoundMatchup)
+            {
+                @Html.Partial("_RoundMatchupTableBodyItem", item)
+            }                
+        }
+    </tbody>
+</table>
 
-        <div class="col-md-3 mt-sm">
-            @Html.ActionLink("Input Results", "Results", "RoundMatchups", null, new { @class = "btn btn-primary" })
-        </div>
-    </div>
-    @Html.Partial("_Sidebar")
+
+<div class="col-md-3 mt-sm">
+    @Html.ActionLink("Input Results", "Index", "Results", null, new { @class = "btn btn-primary" })
 </div>
+    @*@Html.Partial("_Sidebar")*@
 
 

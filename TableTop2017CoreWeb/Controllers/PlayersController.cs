@@ -22,7 +22,16 @@ namespace TableTop2017CoreWeb.Controllers
         // GET: Players
         public async Task<IActionResult> Index()
         {
-            List<Player> players = await _context.Players.OrderByDescending(p => p.BattleScore).ToListAsync();
+            List<Player> players = await _context.Players.ToListAsync();
+            ViewData["Errors"] = TempData["Errors"];
+            Tournament tournament = _context.Tournaments.First();
+            ViewData["TournamentId"] = tournament.Id;
+
+            foreach (Player player in players)
+            {
+                player.WeightedScore = ((int)(player.BattleScore * tournament.BattleScoreRatio) + (int)(player.SportsmanshipScore * tournament.SportsmanshipScoreRatio) + (int)(player.ArmyScore * tournament.ArmyScoreRatio));
+            }
+            players = players.OrderByDescending(p => p.WeightedScore).ToList();
             return View(players);
         }
 
@@ -56,7 +65,7 @@ namespace TableTop2017CoreWeb.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,BattleScore,SportsmanshipScore,Army,Active,EmailAddress,Notes,Paid")] Player player)
+        public async Task<IActionResult> Create([Bind("Id,Name,BattleScore,SportsmanshipScore,Army,ArmyScore,Active,Bye,EmailAddress,Notes,Paid")] Player player)
         {
             if (ModelState.IsValid)
             {
@@ -88,7 +97,7 @@ namespace TableTop2017CoreWeb.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,BattleScore,SportsmanshipScore,Army,Active,EmailAddress,Notes,Paid")] Player player)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,BattleScore,SportsmanshipScore,Army,ArmyScore,Active,Bye,EmailAddress,Notes,Paid")] Player player)
         {
             if (id != player.Id)
             {

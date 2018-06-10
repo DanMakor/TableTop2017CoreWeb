@@ -34,9 +34,21 @@
                 <span asp-validation-for="Army" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="ArmyScore" class="control-label"></label>
+                <input asp-for="ArmyScore" class="form-control" />
+                <span asp-validation-for="SportsmanshipScore" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <div class="checkbox">
                     <label>
                         <input asp-for="Active" /> @Html.DisplayNameFor(model => model.Active)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Bye" /> @Html.DisplayNameFor(model => model.Bye)
                     </label>
                 </div>
             </div>

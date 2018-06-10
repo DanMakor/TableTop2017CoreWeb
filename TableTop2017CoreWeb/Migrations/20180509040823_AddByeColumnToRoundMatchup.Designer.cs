@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Storage.Internal;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
 using System;
 using TableTop2017CoreWeb.Data;
@@ -11,13 +12,15 @@ using TableTop2017CoreWeb.Data;
 namespace TableTop2017CoreWeb.Migrations
 {
     [DbContext(typeof(TournamentDbContext))]
-    partial class TournamentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180509040823_AddByeColumnToRoundMatchup")]
+    partial class AddByeColumnToRoundMatchup
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.3-rtm-10026");
+                .HasAnnotation("ProductVersion", "2.0.2-rtm-10011")
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("TableTop2017CoreWeb.Models.Player", b =>
                 {
@@ -27,8 +30,6 @@ namespace TableTop2017CoreWeb.Migrations
                     b.Property<bool>("Active");
 
                     b.Property<string>("Army");
-
-                    b.Property<int>("ArmyScore");
 
                     b.Property<int>("BattleScore");
 
@@ -45,8 +46,6 @@ namespace TableTop2017CoreWeb.Migrations
                     b.Property<bool>("Paid");
 
                     b.Property<int>("SportsmanshipScore");
-
-                    b.Property<int>("WeightedScore");
 
                     b.HasKey("Id");
 
@@ -71,6 +70,8 @@ namespace TableTop2017CoreWeb.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Bye");
 
                     b.Property<string>("Discriminator")
                         .IsRequired();
@@ -104,22 +105,6 @@ namespace TableTop2017CoreWeb.Migrations
                     b.ToTable("RoundMatchups");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("RoundMatchup");
-                });
-
-            modelBuilder.Entity("TableTop2017CoreWeb.Models.Tournament", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<double>("ArmyScoreRatio");
-
-                    b.Property<double>("BattleScoreRatio");
-
-                    b.Property<double>("SportsmanshipScoreRatio");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Tournaments");
                 });
 
             modelBuilder.Entity("TableTop2017CoreWeb.Models.PairRoundMatchup", b =>

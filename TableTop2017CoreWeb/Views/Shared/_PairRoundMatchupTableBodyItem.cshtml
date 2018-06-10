@@ -1,60 +1,88 @@
 ﻿@model TableTop2017CoreWeb.Models.PairRoundMatchup
 
-    
+@{ Boolean bye = false;
+    if (Model.PlayerTwo == null)
+    {
+        bye = true;
+    }
+}
+
 @*PlayerOne and PlayerTwo are the first team
-PlayerThree and PlayerFour are the second team*@
-<tr>
-    <td>
-        @Html.DisplayFor(model => model.RoundNo)
-    </td>
-    <td>
-        @Html.DisplayFor(model => model.PlayerOne.SportsmanshipScore)
-    </td>
-    <td>
-        @Html.DisplayFor(model => model.PlayerOne.BattleScore)
-    </td>
+    PlayerThree and PlayerFour are the second team*@
+<tr class="@(bye ? "bg-warning" : " ")">
+    @if (!bye)
+    {
+        <td>
+            @Html.DisplayFor(model => model.PlayerOne.SportsmanshipScore)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.PlayerOne.BattleScore)
+        </td>
+    }
+    else
+    {
+        <td></td>
+        <td></td>
+    }
     <td>
         @Html.DisplayFor(model => model.PlayerOne.Name)
     </td>
-    <td>
-        @Html.DisplayFor(model => model.Table)
-    </td>
-    <td>
-        @Html.DisplayFor(model => model.PlayerThree.Name)
-    </td>
-    <td>
-        @Html.DisplayFor(model => model.PlayerThree.BattleScore)
-    </td>
-    <td>
-        @Html.DisplayFor(model => model.PlayerThree.SportsmanshipScore)
-    </td>
+    @if (!bye)
+    {
+        <td>
+            @Html.DisplayFor(model => model.Table)
+        </td>
+    }
+    else
+    {
+        <td></td>
+
+    }
+    @*If this is a bye round*@
+    @if (bye)
+    {
+        <td class="text-warning">[_BYE_]</td>
+        <td></td>
+        <td></td>
+    }
+    else
+    {
+        <td>
+            @Html.DisplayFor(model => model.PlayerThree.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.PlayerThree.BattleScore)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.PlayerThree.SportsmanshipScore)
+        </td>
+    }
     <td>
         <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
     </td>
 </tr>
-<tr>
-    <td>
-
-    </td>
-    <td>
-        @Html.DisplayFor(model => model.PlayerTwo.SportsmanshipScore)
-    </td>
-    <td>
-        @Html.DisplayFor(model => model.PlayerTwo.BattleScore)
-    </td>
-    <td>
-        @Html.DisplayFor(model => model.PlayerTwo.Name)
-    </td>
-    <td>
-    </td>
-    <td>
-        @Html.DisplayFor(model => model.PlayerFour.Name)
-    </td>
-    <td>
-        @Html.DisplayFor(model => model.PlayerFour.BattleScore)
-    </td>
-    <td>
-        @Html.DisplayFor(model => model.PlayerFour.SportsmanshipScore)
-    </td>
-</tr>
+@if (!bye)
+{
+    <tr>
+        <td>
+            @Html.DisplayFor(model => model.PlayerTwo.SportsmanshipScore)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.PlayerTwo.BattleScore)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.PlayerTwo.Name)
+        </td>
+        <td></td>
+        <td>
+            @Html.DisplayFor(model => model.PlayerFour.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.PlayerFour.BattleScore)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.PlayerFour.SportsmanshipScore)
+        </td>
+    </tr>
+}
 
