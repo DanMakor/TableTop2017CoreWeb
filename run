@@ -1,0 +1,4 @@
+#!/bin/bash
+#run the ASP.Net Web Application
+cd /home/ubuntu/TableTop2017CoreWeb/TableTop2017CoreWeb 
+dotnet run
