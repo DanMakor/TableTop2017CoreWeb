@@ -1,4 +1,6 @@
-﻿@model TableTop2017CoreWeb.Models.AdminEditViewModel
+
+﻿@model TableTop2017CoreWeb.Models.AdminEditRoundMatchupsViewModel
+
 
 @{
     ViewData["Title"] = "MatchupsEdit";
@@ -12,60 +14,61 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="RoundMatchup.Id" />
+
+            <input type="hidden" asp-for="Id" />
             <div class="form-group">
-                <label asp-for="RoundMatchup.PlayerOneId" class="control-label"></label>
-                <select asp-for="RoundMatchup.PlayerOneId">
+                <label asp-for="PlayerOneId" class="control-label"></label>
+                <select asp-for="PlayerOneId">
                     @foreach (var item in Model.Players)
                     {
-            <option selected="@(item.Id == Model.RoundMatchup.PlayerOneId)" value="@item.Id">
-                @item.Name
-            </option>
+                        <option selected="@(item.Id == Model.PlayerOneId)" value="@item.Id">
+                            @item.Name
+                        </option>
                     }
                 </select>
-                <span asp-validation-for="RoundMatchup.PlayerOneId" class="text-danger"></span>
+                <span asp-validation-for="PlayerOneId" class="text-danger"></span>
             </div>
-            @if (Model.RoundMatchup.PlayerTwoId != 0.5)
+            @if (Model.PlayerTwoId != 0.5)
             {
                 <div class="form-group">
-                    <label asp-for="RoundMatchup.PlayerTwoId" class="control-label"></label>
-                    <select asp-for="RoundMatchup.PlayerTwoId">
+                    <label asp-for="PlayerTwoId" class="control-label"></label>
+                    <select asp-for="PlayerTwoId">
                         @foreach (var item in Model.Players)
                         {
-                <option selected="@(item.Id == Model.RoundMatchup.PlayerTwoId)" value="@item.Id">
-                    @item.Name
-                </option>
+                            <option selected="@(item.Id == Model.PlayerTwoId)" value="@item.Id">
+                                @item.Name
+                            </option>
                         }
                     </select>
-                    <span asp-validation-for="RoundMatchup.PlayerTwoId" class="text-danger"></span>
+                    <span asp-validation-for="PlayerTwoId" class="text-danger"></span>
                 </div>
             }
-            @if (Model.RoundMatchup.PlayerThreeId != 0.5) {
+            @if (Model.PlayerThreeId != 0.5) {
                 <div class="form-group">
-                    <label asp-for="RoundMatchup.PlayerThreeId" class="control-label"></label>
-                    <select asp-for="RoundMatchup.PlayerThreeId">
+                    <label asp-for="PlayerThreeId" class="control-label"></label>
+                    <select asp-for="PlayerThreeId">
                         @foreach (var item in Model.Players)
                             {
-                <option selected="@(item.Id == Model.RoundMatchup.PlayerThreeId)" value="@item.Id">
-                    @item.Name
-                </option>
+                                <option selected="@(item.Id == Model.PlayerThreeId)" value="@item.Id">
+                                    @item.Name
+                                </option>
                             }
                     </select>
-                    <span asp-validation-for="RoundMatchup.PlayerThreeId" class="text-danger"></span>
+                    <span asp-validation-for="PlayerThreeId" class="text-danger"></span>
                 </div>
             }
-            @if (Model.RoundMatchup.PlayerFourId != 0.5) {
+            @if (Model.PlayerFourId != 0.5) {
                 <div class="form-group">
-                    <label asp-for="RoundMatchup.PlayerFourId" class="control-label"></label>
-                    <select asp-for="RoundMatchup.PlayerFourId">
+                    <label asp-for="PlayerFourId" class="control-label"></label>
+                    <select asp-for="PlayerFourId">
                         @foreach (var item in Model.Players)
                             {
-                <option selected="@(item.Id == Model.RoundMatchup.PlayerFourId)" value="@item.Id">
-                    @item.Name
-                </option>
+                                <option selected="@(item.Id == Model.PlayerFourId)" value="@item.Id">
+                                    @item.Name
+                                </option>
                             }
                     </select>
-                    <span asp-validation-for="RoundMatchup.PlayerFourId" class="text-danger"></span>
+                    <span asp-validation-for="PlayerFourId" class="text-danger"></span>
                 </div>
             }
             <p class="text-danger">@TempData["Errors"]</p>

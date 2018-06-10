@@ -20,6 +20,9 @@ namespace TableTop2017CoreWeb.Models
         public int TableNo { get; set; }
 
         //Used just in case a player record has the default int value of 0 ruining existence checking
+        public List<Player> Players { get; set; }
+
+
         public AdminEditRoundMatchupsViewModel()
         {
             PlayerOneId = 0.5;

@@ -25,7 +25,9 @@ namespace TableTop2017CoreWeb.Controllers
             var roundMatchups = _context.RoundMatchups.Where(r => !(r is PairRoundMatchup)).Where(r => r.RoundNo == lastRoundNo).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).ToList();
             var pairRoundMatchups = _context.PairRoundMatchups.Where(r => r.RoundNo == lastRoundNo).Include(r => r.PlayerOne).Include(r => r.PlayerTwo).Include(r => r.PlayerThree).Include(r => r.PlayerFour).ToList();
 
-            return View(roundMatchups.Union(pairRoundMatchups));
+
+            return View(roundMatchups.Union(pairRoundMatchups).OrderBy(r => r.RoundNo));
+
         }
 
         //GET: RoundMatchupEdit

@@ -19,6 +19,7 @@ namespace TableTop2017CoreWeb.Controllers
             _context = context;
         }
 
+
         // GET: Tournaments
         public async Task<IActionResult> Index()
         {
@@ -52,6 +53,10 @@ namespace TableTop2017CoreWeb.Controllers
             }
             return View(tournament);
         }
+
+        //Single tournament is seeded into the database upon application startup
+        //The logic for this can be found in Initialize.cs and Program.cs
+
 
         // GET: Tournaments/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -110,6 +115,7 @@ namespace TableTop2017CoreWeb.Controllers
             return View(tournament);
         }
 
+
         // GET: Tournaments/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -138,6 +144,7 @@ namespace TableTop2017CoreWeb.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool TournamentExists(int id)
         {

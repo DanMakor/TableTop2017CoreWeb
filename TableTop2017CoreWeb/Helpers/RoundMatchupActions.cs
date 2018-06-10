@@ -35,7 +35,9 @@ namespace TableTop2017CoreWeb.Helpers
         public static Boolean GenerateNextRound(TournamentDbContext _context)
         {
             List<Player> players = _context.Players.Where(p => p.Active && p.Bye == false && p.Name != "Bye").OrderByDescending(p => p.BattleScore).ToList();
+
             List<int> AllocatedTables = new List<int>(GetNoOfTables(_context));
+
             Boolean error = false;
             int secondaryIndex = 0;
             int i = 0;
@@ -155,7 +157,9 @@ namespace TableTop2017CoreWeb.Helpers
                     };
 
                     //allocates table for matchup
+
                     roundMatchup.Table = AllocateTable(GetTables(player, _context), AllocatedTables, _context);
+
                     _context.Add(roundMatchup);
                 }
                 //If there are no more unique matchups
@@ -174,7 +178,9 @@ namespace TableTop2017CoreWeb.Helpers
                             PlayerTwo = player.CurrentOpponent
                         };
 
+
                         roundMatchup.Table = AllocateTable(GetTables(player, _context), AllocatedTables, _context);
+
                         _context.Add(roundMatchup);
                     }
                 }
@@ -652,6 +658,7 @@ namespace TableTop2017CoreWeb.Helpers
 
             return (errors);
         }
+
         //Returns a table to be assigned to a matchup. Also keeps a record of allocated tables for round. 
         public static int AllocateTable(List<int> tables, List<int> allocated, TournamentDbContext _context)
         {
@@ -775,6 +782,7 @@ namespace TableTop2017CoreWeb.Helpers
             //Where(r => r.roundNo == currentRound);
             return tables;
         }
+
     }
 }
 

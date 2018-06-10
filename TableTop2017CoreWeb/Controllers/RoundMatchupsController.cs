@@ -28,16 +28,19 @@ namespace TableTop2017CoreWeb.Controllers
 
         public void Database()
         {
+
             List<RoundsModel> rounds = _context.RoundsModel.ToList();
             foreach (RoundsModel round in rounds)
             {
                 _context.Remove(round);
             }
+
             List<RoundMatchup> roundmatchups = _context.RoundMatchups.ToList();
             foreach(RoundMatchup roundmatchup in roundmatchups)
             {
                 _context.Remove(roundmatchup);
             }
+
             _context.SaveChanges();
             foreach (Player player in _context.Players.ToList())
             {
@@ -45,10 +48,20 @@ namespace TableTop2017CoreWeb.Controllers
                 player.SportsmanshipScore = 0;
                 player.ArmyScore = 0;
                 _context.SaveChanges();
+
             }
             //PlayerActions.SetAllPlayerScores(_context);
         }
 
+ 
+
+        //Generate the RoundMatchups 
+        public ActionResult GenerateRoundMatchups()
+        {
+            RoundMatchupActions.GenerateNextRound(_context);
+            return RedirectToAction("Index", "Admin");
+        }
+        
         public ActionResult DisplayNextRound()
         {
             List<Player> activePlayers = _context.Players.Where(p => p.Active == true).Where(p => p.Bye == false).ToList();
@@ -89,13 +102,6 @@ namespace TableTop2017CoreWeb.Controllers
             return View(roundMatchups.Union(pairRoundMatchups));
         }
 
-        //Generate the RoundMatchups 
-        public ActionResult GenerateRoundMatchups()
-        {
-            RoundMatchupActions.GenerateNextRound(_context);
-            return RedirectToAction("Index", "Admin");
-        }
-        
 
         // GET: RoundMatchups/Edit/5
         public async Task<IActionResult> Edit(int? id)
