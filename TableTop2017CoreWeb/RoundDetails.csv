@@ -1,0 +1,9 @@
+﻿sep=,
+RoundNo,Table,PlayerOne,PlayerOneBattleScore,PlayerOneSportsmanshipScore,PlayerTwo,PlayerTwoBattleScore,PlayerTwoSportsmanshipScore,PlayerThree,PlayerThreeBattleScore,PlayerThreeSportsmanshipScore,PlayerFour,PlayerFourBattleScore,PlayerFourSportsmanshipScore
+1,1,Second Testing Player,23,12,Thirdc Player,123,32,,,,,,
+1,0,Check algo,23,43,Fourth Player,12,12,,,,,,
+2,2,Thirdc Player,5,5,Check algo,12,5,,,,,,
+2,1,Second Testing Player,10,5,Fourth Player,15,20,,,,,,
+3,1,Thirdc Player,0,0,Fourth Player,0,0,,,,,,
+3,2,Check algo,0,0,Second Testing Player,0,0,,,,,,
+4,0,Thirdc Player,0,0,Fourth Player,0,0,Check algo,0,0,Second Testing Player,0,0

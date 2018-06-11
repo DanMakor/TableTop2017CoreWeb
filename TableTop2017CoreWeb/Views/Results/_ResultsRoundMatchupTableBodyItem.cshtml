@@ -1,0 +1,68 @@
+﻿
+@model TableTop2017CoreWeb.Models.RoundMatchup
+
+@{ Boolean bye = false;
+    if (Model.PlayerTwo == null)
+    {
+        bye = true;
+    }
+}
+
+<tr class="@(bye ? "bg-warning" : " ")">
+    @if (!bye)
+    {
+        <td>
+            @Html.DisplayFor(model => model.PlayerOneSportsmanshipScore)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.PlayerOneBattleScore)
+        </td>
+    }
+    else
+    {
+        <td></td>
+        <td></td>
+    }
+    <td>
+        @Html.DisplayFor(model => model.PlayerOne.Name)
+    </td>
+    @if (!bye)
+    {
+        <td>
+            @Html.DisplayFor(model => model.Table)
+        </td>
+    }
+    else
+    {
+        <td></td>
+
+    }
+    @*If this is a bye round*@
+    @if (bye)
+    {
+        <td class="text-warning">[_BYE_]</td>
+        <td></td>
+        <td></td>
+    }
+    else
+    {
+        <td>
+            @Html.DisplayFor(model => model.PlayerTwo.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.PlayerTwoBattleScore)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.PlayerTwoSportsmanshipScore)
+        </td>
+    }
+    <td>
+        @if (!bye){ <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> }
+    </td>
+</tr>
+
+
+
+
+
+

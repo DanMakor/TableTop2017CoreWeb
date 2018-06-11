@@ -1,0 +1,49 @@
+﻿body {
+	padding-top: 50px;
+	padding-bottom: 20px;
+}
+
+/* QR code generator */
+#qrCode {
+    margin: 15px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+	max-width: 280px;
+}
+
+.text-primary {
+	color: #428bca !important;
+}
+
+.text-secondary {
+	color: #6c757d !important;
+}
+
+.mt-xs {
+	margin-top: 20px;
+}
+
+.mt-sm {
+	margin-top: 30px;
+}
+
+.mt-md {
+	margin-top: 40px;
+}
+
+.new-player {
+	display: flex;
+	align-items: flex-end;
+}
+
+.last-name {
+	margin-top: 39px;
+}
+
+.player-button {
+	margin-top: 64px;
+}

@@ -1,0 +1,5 @@
+﻿sep=,
+Name,Email,Army,BattleScore,SportsmanshipScore,ArmyScore,WeightedScore,Notes,Paid
+Second Testing Player,SecondTest@hotmail.test,GoblinBoys,0,0,5,0,Ok,False
+Thirdc Player,totes@totes.com,Shoulda Gone to spec,0,0,13,0,Ok ok ok i get it,True
+Check algo,ur@test,wt,0,0,32,0,chek,False

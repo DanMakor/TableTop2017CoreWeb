@@ -1,0 +1,69 @@
+﻿@model IEnumerable<TableTop2017CoreWeb.Models.RoundMatchup>
+
+@{
+    ViewData["Title"] = "AllRounds";
+}
+
+<h2>All Rounds</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.RoundNo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerOneBattleScore)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerOneSportsmanshipScore)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerOne.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Table)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerTwo.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerTwoBattleScore)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerTwoSportsmanshipScore)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            @if (item is PairRoundMatchup)
+            {
+                @Html.Partial("_PairRoundMatchupTableBodyItemAllRounds", item as PairRoundMatchup)
+            }
+            else if (item is RoundMatchup)
+            {
+                @Html.Partial("_RoundMatchupTableBodyItemAllRounds", item)
+            }                
+        }
+    </tbody>
+</table>
+
+<div class="mt-xs">
+    <p class="text-success">@ViewData["Status"]</p>
+    <p class="text-danger">@ViewData["DuplicatePlayers"]</p>
+    <p class="text-danger">@ViewData["OverallocatedPlayers"]</p>
+    <p class="text-danger">@ViewData["UnallocatedPlayers"]</p>
+    <p class="text-warning">@ViewData["DuplicateOpponents"]</p>
+</div>
+
+@Html.ActionLink("Validate Matchups", "ValidateAllRoundMatchups", "Admin", null, new { @class = "btn btn-primary mt-xs" })
+
+<div class="row mt-sm">
+    <div class="col-md-12">
+        <div class="col-md-3">@Html.ActionLink("Export Rounds", "ExportRounds", "Admin", null, new { @class = "btn btn-success" })</div>
+        <h4 class="col-md-12 @( ((string)ViewData["ExportStatus"] == "Successfully Exported") ? "text-success" : "text-danger")">@ViewData["ExportStatus"]</h4>
+    </div>
+</div>

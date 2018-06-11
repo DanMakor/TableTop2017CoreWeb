@@ -1,0 +1,11 @@
+﻿
+@{
+    ViewData["Title"] = "ClearRounds";
+}
+
+<h2>Clear Rounds</h2>
+
+<h3 class="text-danger">If you click below, you will remove all rounds from the database and it cannot be undone</h3>
+
+@Html.ActionLink("Clear Rounds", "ConfirmClearRounds", "RoundMatchups", null, new { @class = "btn btn-danger" })
+

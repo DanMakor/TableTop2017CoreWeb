@@ -1,0 +1,69 @@
+﻿@model TableTop2017CoreWeb.Models.Player
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Player</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BattleScore)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BattleScore)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SportsmanshipScore)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SportsmanshipScore)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Army)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Army)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Active)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Active)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.EmailAddress)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.EmailAddress)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Notes)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Notes)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Paid)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Paid)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

@@ -1,0 +1,69 @@
+﻿@model TableTop2017CoreWeb.Models.PairRoundMatchup
+
+@{ Boolean bye = false;
+    if (Model.PlayerTwo == null)
+    {
+        bye = true;
+    }
+}
+
+@*PlayerOne and PlayerTwo are the first team
+    PlayerThree and PlayerFour are the second team*@
+<tr class="@(bye ? "bg-warning" : " ")">
+    @if (!bye)
+    {
+        <td>
+            @Html.DisplayFor(model => model.PlayerOne.Army)
+        </td>
+    }
+    else
+    {
+        <td></td>
+    }
+    <td>
+        @Html.DisplayFor(model => model.PlayerOne.Name)
+    </td>
+    @if (!bye)
+    {
+        <td>
+            @Html.DisplayFor(model => model.Table)
+        </td>
+    }
+    else
+    {
+        <td></td>
+    }
+    @if (bye)
+    {
+        <td class="text-warning">[_BYE_]</td>
+        <td></td>
+    }
+    else
+    {
+        <td>
+            @Html.DisplayFor(model => model.PlayerThree.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.PlayerThree.Army)
+        </td>
+    }
+</tr>
+@if (!bye)
+{
+    <tr>
+        <td>
+            @Html.DisplayFor(model => model.PlayerTwo.Army)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.PlayerTwo.Name)
+        </td>
+        <td></td>
+        <td>
+            @Html.DisplayFor(model => model.PlayerFour.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.PlayerFour.Army)
+        </td>
+    </tr>
+}
+

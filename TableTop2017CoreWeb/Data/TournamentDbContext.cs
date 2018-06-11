@@ -1,0 +1,29 @@
+﻿using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using TableTop2017CoreWeb.Models;
+
+namespace TableTop2017CoreWeb.Data
+{
+    public class TournamentDbContext : DbContext
+    {
+        public TournamentDbContext(DbContextOptions<TournamentDbContext> options) : base(options) {
+
+        }
+
+        public DbSet<RoundsModel> Rounds { get; set; }
+        public DbSet<Player> Players { get; set; }
+        public DbSet<RoundMatchup> RoundMatchups { get; set; }
+        public DbSet<PairRoundMatchup> PairRoundMatchups { get; set; }
+        public DbSet<Tournament> Tournaments { get; set; }
+    }
+}
+
+public static class EntityExtensions
+{
+    public static void Clear<T>(this DbSet<T> dbSet) where T : class
+    {        dbSet.RemoveRange(dbSet);
+    }
+}

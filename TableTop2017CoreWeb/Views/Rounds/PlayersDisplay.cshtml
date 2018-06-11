@@ -1,0 +1,202 @@
+﻿@model TableTop2017CoreWeb.Models.RoundsModel
+
+@{
+    ViewData["Title"] = "TableTop Tournament Bracket";
+}
+
+@{
+    decimal deci = Model.Players.Count() / 2;
+    int NumOfTables = (int)Math.Round(deci, 0) + 1;
+    if (Model.NoTableTops > 0)
+    {
+        NumOfTables = Model.NoTableTops;
+
+    }
+
+}
+
+<div class="row mt-md">
+    <div class="col-md-7">
+        <form asp-action="GoToAction">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group col-md-4">
+                <h4 class="text-primary"><label asp-for="NoTableTops" class="control-label"></label></h4>
+                <input asp-for="NoTableTops" value="@NumOfTables" class="form-control" />
+                <span asp-validation-for="NoTableTops" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-4 mt-md">
+                <button type="submit" name="submitButton" value="GoToDisplayNextRound" class="btn btn-primary" >Generate Round</button>
+            </div>
+            <div class="form-group col-md-4 mt-md">
+                <button type="submit" name="submitButton" value="GoToDisplayNextPairRound" class="btn btn-primary" >Generate Pair Round</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-md-3">
+        <h4 class="text-primary">Click to Add new Players</h4>
+        @Html.ActionLink("Add Player", "Create", "Players", null, new { @class = "btn btn-primary" })
+    </div>
+
+</div>
+
+<div class="col-md-12 mt-sm">
+    <table class="table">
+        <thead>
+            <tr>
+                @{
+        if (Model.Players.Count > 0)
+        {
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().BattleScore)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().SportsmanshipScore)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().ArmyScore)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().WeightedScore)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().Army)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().Active)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().Bye)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().EmailAddress)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().Notes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players.First().Paid)
+            </th>
+            <th></th>
+}
+else
+{
+            <th>
+                Name
+            </th>
+            <th>
+                Battle Score
+            </th>
+            <th>
+                Sportsmanship Score
+            </th>
+            <th>
+                Army Score
+            </th>
+            <th>
+                 Weighted Score
+            </th>
+            <th>
+                Army
+            </th>
+            <th>
+                Active
+            </th>
+            <th>
+                Bye
+            </th>
+            <th>
+                Email Address
+            </th>
+            <th>
+                Notes
+            </th>
+            <th>
+                Paid
+            </th>
+            <th></th>
+
+}
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Players)
+            {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BattleScore)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SportsmanshipScore)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ArmyScore)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WeightedScore)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Army)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Active)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Bye)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EmailAddress)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Notes)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Paid)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="row mt-xs">
+    <p class="alert-danger">@ViewData["Errors"]</p>
+</div>
+
+<div class="row">
+    <div class="col-md-7">
+        <form asp-action="GoToAction">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group col-md-4">
+                <h4 class="text-primary"><label asp-for="NoTableTops" class="control-label"></label></h4>
+                <input asp-for="NoTableTops" value="@NumOfTables" class="form-control" />
+                <span asp-validation-for="NoTableTops" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-4 mt-md">
+                <button type="submit" name="submitButton" value="GoToDisplayNextRound" class="btn btn-primary" />Generate Round</button>
+            </div>
+            <div class="form-group col-md-4 mt-md">
+                <button type="submit" name="submitButton" value="GoToDisplayNextPairRound" class="btn btn-primary">Generate Pair Round</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row mt-sm">
+    <div class="col-md-12">
+        <div class="col-md-3">@Html.ActionLink("Export Players", "ExportPlayers", "Players", null, new { @class = "btn btn-success" })</div>
+        <h4 class="col-md-12 @( ((string)ViewData["ExportStatus"] == "Successfully Exported") ? "text-success" : "text-danger")">@ViewData["ExportStatus"]</h4>
+    </div>
+</div>

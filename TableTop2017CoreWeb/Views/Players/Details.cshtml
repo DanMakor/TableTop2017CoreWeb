@@ -1,0 +1,48 @@
+﻿@model TableTop2017CoreWeb.Models.Player
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Player</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.firstName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.firstName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.lastName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.lastName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.emailAddress)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.emailAddress)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.notes)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.notes)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.hasPaid)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.hasPaid)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

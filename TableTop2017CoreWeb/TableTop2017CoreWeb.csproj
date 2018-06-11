@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <UserSecretsId>aspnet-TableTop2017CoreWeb-329FA077-8076-408C-9416-E65146F8951A</UserSecretsId>
+    <Authors>Daniel; Stephen</Authors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20180502000006_PlayerTeammate.cs" />
+    <Compile Remove="Migrations\20180502000006_PlayerTeammate.Designer.cs" />
+    <Compile Remove="Migrations\20180502034810_PairRoundMatchup.cs" />
+    <Compile Remove="Migrations\20180502034810_PairRoundMatchup.Designer.cs" />
+    <Compile Remove="Migrations\20180502035502_PairRoundMatchup.cs" />
+    <Compile Remove="Migrations\20180502035502_PairRoundMatchup.Designer.cs" />
+    <Compile Remove="Migrations\20180503120551_Testing.cs" />
+    <Compile Remove="Migrations\20180503120551_Testing.Designer.cs" />
+    <Compile Remove="Migrations\20180503131800_PlayerOpponentTeammateRelationship.cs" />
+    <Compile Remove="Migrations\20180503131800_PlayerOpponentTeammateRelationship.Designer.cs" />
+    <Compile Remove="Migrations\20180503131905_PlayerOpponentTeammateRelationship.cs" />
+    <Compile Remove="Migrations\20180503131905_PlayerOpponentTeammateRelationship.Designer.cs" />
+    <Compile Remove="Migrations\20180503132539_PlayerTeammateOppRelationship.cs" />
+    <Compile Remove="Migrations\20180503132539_PlayerTeammateOppRelationship.Designer.cs" />
+    <Compile Remove="Migrations\20180503132629_PlayerTeammateOppRelationship.cs" />
+    <Compile Remove="Migrations\20180503132629_PlayerTeammateOppRelationship.Designer.cs" />
+    <Compile Remove="Migrations\20180503132654_PlayerTeammateOppRelationship.cs" />
+    <Compile Remove="Migrations\20180503132654_PlayerTeammateOppRelationship.Designer.cs" />
+    <Compile Remove="Migrations\20180503141104_PendingChanges.cs" />
+    <Compile Remove="Migrations\20180503141104_PendingChanges.Designer.cs" />
+    <Compile Remove="Migrations\20180511014107_ArmyScoreAndTournamentModel.cs" />
+    <Compile Remove="Migrations\20180511014107_ArmyScoreAndTournamentModel.Designer.cs" />
+    <Compile Remove="Migrations\20180511014301_ArmyScoreAndTournamentModel.cs" />
+    <Compile Remove="Migrations\20180511014301_ArmyScoreAndTournamentModel.Designer.cs" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.2" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.jQuery.Unobtrusive.Ajax" Version="3.2.5" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.3" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.2" />
+    <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="2.0.1" />
+    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.3" />
+    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\Shared\Editor Template\" />
+  </ItemGroup>
+</Project>
